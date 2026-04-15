@@ -271,6 +271,15 @@
     color: var(--text-heading); padding: 0 12px; min-width: 64px; text-align: center;
   }
 
+  .slide-logo {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    width: 120px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
   .menu-toggle {
     display: none; position: absolute;
     top: 16px; left: 16px; z-index: 20;
@@ -300,7 +309,7 @@
   @media print {
     @page { size: landscape; margin: 0; }
     html, body { background: #fff; height: auto; }
-    .sidebar, .progress, .controls, .menu-toggle { display: none !important; }
+    .sidebar, .progress, .controls, .menu-toggle, .slide-logo { display: none !important; }
     .slide.hero::before, .slide.hero::after { display: none !important; }
     .app { display: block; height: auto; overflow: visible; }
     .main { height: auto; overflow: visible; }
@@ -329,6 +338,7 @@
     <nav class="sidebar-nav"></nav>
   </aside>
   <main class="main">
+    <img src="https://www.popronsystems.cz/wp-content/uploads/2021/05/Popron_systems_logo_01.svg" alt="Popron Systems" class="slide-logo">
     <div class="progress"><div class="progress-bar"></div></div>
     <div class="slides">
 
