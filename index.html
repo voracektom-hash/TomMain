@@ -71,46 +71,443 @@
       </div>
     </section>
 
-    <!-- ============ RAG DASHBOARD (placeholder) ============ -->
+    <!-- ============ RAG DASHBOARD ============ -->
     <section class="section" aria-labelledby="rag-heading">
       <h2 id="rag-heading" class="section-title">RAG Dashboard</h2>
-      <p class="section-placeholder">Tabulka dimenzí (scope, schedule, budget, resources, risks, quality).</p>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Dimenze</th>
+              <th>Status</th>
+              <th>Komentář</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Scope</td>
+              <td><span class="rag-badge rag-green">GREEN</span></td>
+              <td>Scope je stabilní, žádné schválené změny v tomto období.</td>
+              <td class="trend trend--stable">→</td>
+            </tr>
+            <tr>
+              <td>Schedule</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+              <td>Integrace API zpoždění 1 týden, aktivní opatření.</td>
+              <td class="trend trend--down">↓</td>
+            </tr>
+            <tr>
+              <td>Budget</td>
+              <td><span class="rag-badge rag-green">GREEN</span></td>
+              <td>62 % čerpáno při 58 % dokončenosti; mírná rezerva.</td>
+              <td class="trend trend--up">↑</td>
+            </tr>
+            <tr>
+              <td>Resources</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+              <td>Jeden klíčový vývojář nemocen; zastupování zajištěno.</td>
+              <td class="trend trend--stable">→</td>
+            </tr>
+            <tr>
+              <td>Risks</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+              <td>2 rizika eskalována na střední úroveň.</td>
+              <td class="trend trend--down">↓</td>
+            </tr>
+            <tr>
+              <td>Quality</td>
+              <td><span class="rag-badge rag-green">GREEN</span></td>
+              <td>Test coverage 84 %; žádné kritické defekty v produkci.</td>
+              <td class="trend trend--up">↑</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ MILESTONES & TIMELINE (placeholder) ============ -->
+    <!-- ============ MILESTONES & TIMELINE ============ -->
     <section class="section" aria-labelledby="milestones-heading">
       <h2 id="milestones-heading" class="section-title">Milestones &amp; Timeline</h2>
-      <p class="section-placeholder">Vizuální progress bar a tabulka milníků.</p>
+
+      <div class="progress-block">
+        <div class="progress-block__labels">
+          <span>Celkový postup projektu</span>
+          <span>58 %</span>
+        </div>
+        <div class="progress-bar" role="progressbar" aria-valuenow="58" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar__fill" style="width: 58%"></div>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Milník</th>
+              <th>Plánované datum</th>
+              <th>Skutečné datum</th>
+              <th>Status</th>
+              <th>Postup</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Kick-off &amp; zahájení</td>
+              <td>10. 01. 2026</td>
+              <td>10. 01. 2026</td>
+              <td><span class="status-badge status-done">Dokončeno</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:100%"></div></div></td>
+            </tr>
+            <tr>
+              <td>Analýza požadavků</td>
+              <td>31. 01. 2026</td>
+              <td>02. 02. 2026</td>
+              <td><span class="status-badge status-done">Dokončeno</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:100%"></div></div></td>
+            </tr>
+            <tr>
+              <td>Design &amp; prototyp</td>
+              <td>28. 02. 2026</td>
+              <td>28. 02. 2026</td>
+              <td><span class="status-badge status-done">Dokončeno</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:100%"></div></div></td>
+            </tr>
+            <tr>
+              <td>Vývoj – fáze 1</td>
+              <td>31. 03. 2026</td>
+              <td>07. 04. 2026</td>
+              <td><span class="status-badge status-delayed">Se zpožděním</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:100%"></div></div></td>
+            </tr>
+            <tr>
+              <td>Integrace &amp; testování</td>
+              <td>30. 04. 2026</td>
+              <td>—</td>
+              <td><span class="status-badge status-progress">Probíhá</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:60%"></div></div></td>
+            </tr>
+            <tr>
+              <td>UAT</td>
+              <td>15. 05. 2026</td>
+              <td>—</td>
+              <td><span class="status-badge status-planned">Plánováno</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:0%"></div></div></td>
+            </tr>
+            <tr>
+              <td>Go-live</td>
+              <td>30. 05. 2026</td>
+              <td>—</td>
+              <td><span class="status-badge status-planned">Plánováno</span></td>
+              <td><div class="inline-bar"><div class="inline-bar__fill" style="width:0%"></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ ACHIEVEMENTS (placeholder) ============ -->
+    <!-- ============ ACHIEVEMENTS ============ -->
     <section class="section" aria-labelledby="achievements-heading">
       <h2 id="achievements-heading" class="section-title">Achievements</h2>
-      <p class="section-placeholder">Bullet list dokončených položek v aktuálním období.</p>
+      <ul class="achievement-list" role="list">
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Dokončena migrace databázového schématu na PostgreSQL 16.
+        </li>
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Úspěšně nasazena CI/CD pipeline (GitHub Actions + Docker).
+        </li>
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Schváleny wireframy pro mobilní verzi aplikace.
+        </li>
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Dokončena integrace platební brány (sandbox prostředí).
+        </li>
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Test coverage zvýšena z 71 % na 84 % (unit + integration testy).
+        </li>
+        <li class="achievement-list__item">
+          <span class="achievement-list__icon" aria-hidden="true">✓</span>
+          Provedena bezpečnostní revize API endpointů – 0 kritických nálezů.
+        </li>
+      </ul>
     </section>
 
-    <!-- ============ NEXT STEPS (placeholder) ============ -->
+    <!-- ============ NEXT STEPS ============ -->
     <section class="section" aria-labelledby="next-steps-heading">
       <h2 id="next-steps-heading" class="section-title">Next Steps</h2>
-      <p class="section-placeholder">Plánované aktivity s vlastníky a termíny.</p>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Aktivita</th>
+              <th>Vlastník</th>
+              <th>Termín</th>
+              <th>Priorita</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Dokončit integraci REST API (modul plateb)</td>
+              <td>Jan Novák</td>
+              <td>18. 04. 2026</td>
+              <td><span class="priority-badge priority-high">Vysoká</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Připravit testovací scénáře pro UAT</td>
+              <td>Petra Dvořák</td>
+              <td>22. 04. 2026</td>
+              <td><span class="priority-badge priority-high">Vysoká</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Aktualizovat technickou dokumentaci</td>
+              <td>Martin Kříž</td>
+              <td>25. 04. 2026</td>
+              <td><span class="priority-badge priority-medium">Střední</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Zahájit UAT s klíčovými uživateli</td>
+              <td>Petra Dvořák</td>
+              <td>15. 05. 2026</td>
+              <td><span class="priority-badge priority-high">Vysoká</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Výkonnostní testy produkčního prostředí</td>
+              <td>Jan Novák</td>
+              <td>20. 05. 2026</td>
+              <td><span class="priority-badge priority-medium">Střední</span></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Příprava plánu rollback pro go-live</td>
+              <td>Lukáš Procházka</td>
+              <td>25. 05. 2026</td>
+              <td><span class="priority-badge priority-low">Nízká</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ RISKS & ISSUES (placeholder) ============ -->
+    <!-- ============ RISKS & ISSUES ============ -->
     <section class="section" aria-labelledby="risks-heading">
       <h2 id="risks-heading" class="section-title">Risks &amp; Issues</h2>
-      <p class="section-placeholder">Tabulka: ID, popis, impact, probability, owner, mitigation, RAG.</p>
+      <div class="table-wrapper">
+        <table class="data-table data-table--risks">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Popis</th>
+              <th>Dopad</th>
+              <th>Pravděpodobnost</th>
+              <th>Vlastník</th>
+              <th>Mitigace</th>
+              <th>RAG</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>R-01</td>
+              <td>Zpoždění API integrace 3. strany</td>
+              <td>Vysoký</td>
+              <td>Střední</td>
+              <td>Jan Novák</td>
+              <td>Eskalace na dodavatele, alternativní mock.</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+            </tr>
+            <tr>
+              <td>R-02</td>
+              <td>Dostupnost klíčových zdrojů</td>
+              <td>Střední</td>
+              <td>Nízká</td>
+              <td>PM</td>
+              <td>Zastupování, cross-training.</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+            </tr>
+            <tr>
+              <td>R-03</td>
+              <td>Bezpečnostní zranitelnost v závislosti</td>
+              <td>Vysoký</td>
+              <td>Nízká</td>
+              <td>Martin Kříž</td>
+              <td>Automatizovaný sken, aktualizace balíčků.</td>
+              <td><span class="rag-badge rag-green">GREEN</span></td>
+            </tr>
+            <tr>
+              <td>I-01</td>
+              <td>Testovací prostředí nedostupné 2 dny</td>
+              <td>Střední</td>
+              <td>—</td>
+              <td>DevOps</td>
+              <td>Problém vyřešen, záložní prostředí připraveno.</td>
+              <td><span class="rag-badge rag-green">GREEN</span></td>
+            </tr>
+            <tr>
+              <td>R-04</td>
+              <td>Nerealistické požadavky na výkon</td>
+              <td>Střední</td>
+              <td>Střední</td>
+              <td>Petra Dvořák</td>
+              <td>Workshop s byznysem k revizi SLA.</td>
+              <td><span class="rag-badge rag-amber">AMBER</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ DEPENDENCIES (placeholder) ============ -->
+    <!-- ============ DEPENDENCIES ============ -->
     <section class="section" aria-labelledby="dependencies-heading">
       <h2 id="dependencies-heading" class="section-title">Dependencies</h2>
-      <p class="section-placeholder">Tabulka závislostí na jiných projektech.</p>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Závislost na</th>
+              <th>Typ</th>
+              <th>Potřebné do</th>
+              <th>Status</th>
+              <th>Kontakt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>D-01</td>
+              <td>Projekt Infrastruktura 2026</td>
+              <td>Interní</td>
+              <td>20. 04. 2026</td>
+              <td><span class="status-badge status-progress">Probíhá</span></td>
+              <td>Tomáš Beneš</td>
+            </tr>
+            <tr>
+              <td>D-02</td>
+              <td>API dodavatele platební brány</td>
+              <td>Externí</td>
+              <td>18. 04. 2026</td>
+              <td><span class="status-badge status-delayed">Se zpožděním</span></td>
+              <td>support@vendor.cz</td>
+            </tr>
+            <tr>
+              <td>D-03</td>
+              <td>SSO / Identity Provider</td>
+              <td>Interní</td>
+              <td>30. 04. 2026</td>
+              <td><span class="status-badge status-done">Dokončeno</span></td>
+              <td>IT Security tým</td>
+            </tr>
+            <tr>
+              <td>D-04</td>
+              <td>Schválení GDPR dokumentace</td>
+              <td>Regulatorní</td>
+              <td>10. 05. 2026</td>
+              <td><span class="status-badge status-planned">Plánováno</span></td>
+              <td>DPO</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- ============ BUDGET OVERVIEW (placeholder) ============ -->
+    <!-- ============ BUDGET OVERVIEW ============ -->
     <section class="section" aria-labelledby="budget-heading">
       <h2 id="budget-heading" class="section-title">Budget Overview</h2>
-      <p class="section-placeholder">Vizuální progress bar (spent/total) a tabulka kategorií.</p>
+
+      <div class="progress-block">
+        <div class="progress-block__labels">
+          <span>Celkové čerpání rozpočtu</span>
+          <span>620 000 Kč / 1 000 000 Kč (62 %)</span>
+        </div>
+        <div class="progress-bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar__fill" style="width: 62%"></div>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Kategorie</th>
+              <th>Plán (Kč)</th>
+              <th>Skutečnost (Kč)</th>
+              <th>Zbývá (Kč)</th>
+              <th>Čerpání</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lidské zdroje</td>
+              <td>600 000</td>
+              <td>372 000</td>
+              <td>228 000</td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill" style="width:62%"></div></div>
+                <span class="inline-bar__label">62 %</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Infrastruktura &amp; cloud</td>
+              <td>150 000</td>
+              <td>105 000</td>
+              <td>45 000</td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill inline-bar__fill--warn" style="width:70%"></div></div>
+                <span class="inline-bar__label">70 %</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Licence &amp; software</td>
+              <td>80 000</td>
+              <td>80 000</td>
+              <td>0</td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill inline-bar__fill--full" style="width:100%"></div></div>
+                <span class="inline-bar__label">100 %</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Externí dodavatelé</td>
+              <td>120 000</td>
+              <td>55 000</td>
+              <td>65 000</td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill" style="width:46%"></div></div>
+                <span class="inline-bar__label">46 %</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Rezerva</td>
+              <td>50 000</td>
+              <td>8 000</td>
+              <td>42 000</td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill" style="width:16%"></div></div>
+                <span class="inline-bar__label">16 %</span>
+              </td>
+            </tr>
+            <tr class="table-total">
+              <td><strong>Celkem</strong></td>
+              <td><strong>1 000 000</strong></td>
+              <td><strong>620 000</strong></td>
+              <td><strong>380 000</strong></td>
+              <td>
+                <div class="inline-bar"><div class="inline-bar__fill" style="width:62%"></div></div>
+                <span class="inline-bar__label"><strong>62 %</strong></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- ============ FOOTER ============ -->
