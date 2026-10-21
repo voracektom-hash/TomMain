@@ -1,0 +1,2258 @@
+{
+ "meta_description": "6 045 bytů v aktuální nabídce Byty k prodeji Praha ✓ Parametry hledání: Byty, Praha ✓ Největší nabídka nemovitostí v Česku (110 856 inzerátů) s hledáním na mapě a filtrováním s desítkami parametrů ✓",
+ "meta_title": "Prodej bytu Praha • Sreality.cz",
+ "pagination": {
+  "limit": 22,
+  "offset": 0,
+  "total": 6045
+ },
+ "results": [
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_A/kcKfrMAkFDvG5qOa9H7y3Ou/2836.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_A/kcKfrMAkFDvG5qOa9H7y3Ou/2836.jpeg",
+     "restb_room_type": 4,
+     "room_type_confidence": 1.0
+    }
+   ],
+   "advert_name": "Prodej bytu 3+1 91 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+1",
+    "value": 7
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": true,
+   "has_video": false,
+   "hash_id": 1725177932,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Nové Město",
+    "citypart_seo_name": "nove-mesto",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 2",
+    "district_id": 5002,
+    "district_seo_name": "praha-2",
+    "entity_type": "address",
+    "geohash": "u2fkb73uqv",
+    "gps_lat": 50.072322320331246,
+    "gps_lon": 14.427744506393502,
+    "housenumber": "461",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 2",
+    "quarter_id": 88,
+    "quarter_seo_name": "praha-2",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Ke Karlovu",
+    "street_id": 120103,
+    "street_seo_name": "ke-karlovu",
+    "streetnumber": "8",
+    "ward": null,
+    "ward_id": 14959,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 187,
+   "poi_bus_public_transport_distance": 67,
+   "poi_kindergarten_distance": 257,
+   "poi_medic_distance": 248,
+   "poi_metro_distance": 284,
+   "poi_playground_distance": 472,
+   "poi_post_office_distance": 759,
+   "poi_restaurant_distance": 17,
+   "poi_school_distance": 23,
+   "poi_shop_distance": 737,
+   "poi_small_shop_distance": 93,
+   "poi_train_distance": 1357,
+   "poi_vet_distance": 486,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-2",
+    "seo_name": "bydleni-a-reality-s-r-o",
+    "ward_seo_name": "nove-mesto"
+   },
+   "premise_id": 55953,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_qF_A/k0OqwCKRDbeZQVeH1PRuj/02da.png",
+   "price": 15950000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 15950000.0,
+   "price_czk_m2": 175275,
+   "price_summary": 15950000.0,
+   "price_summary_czk": 15950000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 332129
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_C/ncz4PZ5CZ4EadBXIIJEZaG/5ae7.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_C/ncz4PZ5CZ4EadBXIIJEZaG/5ae7.jpeg",
+     "restb_room_type": 5,
+     "room_type_confidence": 0.8664991855621338
+    }
+   ],
+   "advert_name": "Prodej bytu 3+1 88 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+1",
+    "value": 7
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 1460207692,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Chodov",
+    "citypart_seo_name": "chodov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 4",
+    "district_id": 5004,
+    "district_seo_name": "praha-4",
+    "entity_type": "address",
+    "geohash": "u2fkdh4zue",
+    "gps_lat": 50.033086166,
+    "gps_lon": 14.50592776,
+    "housenumber": "1733",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 11",
+    "quarter_id": 91,
+    "quarter_seo_name": "praha-11",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Valentova",
+    "street_id": 122637,
+    "street_seo_name": "valentova",
+    "streetnumber": "3",
+    "ward": null,
+    "ward_id": 13679,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 614,
+   "poi_bus_public_transport_distance": 113,
+   "poi_kindergarten_distance": 87,
+   "poi_medic_distance": 422,
+   "poi_metro_distance": 574,
+   "poi_playground_distance": 62,
+   "poi_post_office_distance": 838,
+   "poi_restaurant_distance": 142,
+   "poi_school_distance": 111,
+   "poi_shop_distance": 1137,
+   "poi_small_shop_distance": 146,
+   "poi_train_distance": 3234,
+   "poi_vet_distance": 248,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-1",
+    "seo_name": "mm-reality",
+    "ward_seo_name": "nove-mesto"
+   },
+   "premise_id": 1019,
+   "premise_logo": "",
+   "price": 10990000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 10990000.0,
+   "price_czk_m2": 124886,
+   "price_summary": 10990000.0,
+   "price_summary_czk": 10990000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 119996
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qD_E/nO2CysqjGrScbvBeXZHRIoqx/84b7.png"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qD_E/nO2CysqjGrScbvBeXZHRIoqx/84b7.png",
+     "restb_room_type": 2,
+     "room_type_confidence": 0.9357951283454895
+    }
+   ],
+   "advert_name": "Prodej bytu 3+kk 70 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+kk",
+    "value": 6
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 3313299532,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Prosek",
+    "citypart_seo_name": "prosek",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 9",
+    "district_id": 5009,
+    "district_seo_name": "praha-9",
+    "entity_type": "address",
+    "geohash": "u2fm1uekyz",
+    "gps_lat": 50.12323343404601,
+    "gps_lon": 14.495725849757289,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 9",
+    "quarter_id": 119,
+    "quarter_seo_name": "praha-9",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Jablonecká",
+    "street_id": 123133,
+    "street_seo_name": "jablonecka",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 13710,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 169,
+   "poi_bus_public_transport_distance": 284,
+   "poi_kindergarten_distance": 296,
+   "poi_medic_distance": 406,
+   "poi_metro_distance": 301,
+   "poi_playground_distance": 41,
+   "poi_post_office_distance": 175,
+   "poi_restaurant_distance": 122,
+   "poi_school_distance": 141,
+   "poi_shop_distance": 1323,
+   "poi_small_shop_distance": 102,
+   "poi_train_distance": 1088,
+   "poi_vet_distance": 435,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-10",
+    "seo_name": "bausava-market-s-r-o",
+    "ward_seo_name": "vrsovice"
+   },
+   "premise_id": 75107,
+   "premise_logo": "",
+   "price": 9999000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 9999000.0,
+   "price_czk_m2": 142843,
+   "price_summary": 9999000.0,
+   "price_summary_czk": 9999000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 313856
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qD_F/nEwftpXyZJX4uWlHVN908/b887.png"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qD_F/nEwftpXyZJX4uWlHVN908/b887.png",
+     "restb_room_type": 6,
+     "room_type_confidence": 0.9980887770652771
+    }
+   ],
+   "advert_name": "Prodej bytu 3+1 60 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+1",
+    "value": 7
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 4221554764,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Střížkov",
+    "citypart_seo_name": "strizkov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 9",
+    "district_id": 5009,
+    "district_seo_name": "praha-9",
+    "entity_type": "address",
+    "geohash": "u2fm1v788n",
+    "gps_lat": 50.126618596476035,
+    "gps_lon": 14.495779942023587,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 9",
+    "quarter_id": 119,
+    "quarter_seo_name": "praha-9",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Varnsdorfská",
+    "street_id": 123139,
+    "street_seo_name": "varnsdorfska",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 14964,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 325,
+   "poi_bus_public_transport_distance": 257,
+   "poi_kindergarten_distance": 162,
+   "poi_medic_distance": 429,
+   "poi_metro_distance": 336,
+   "poi_playground_distance": 107,
+   "poi_post_office_distance": 377,
+   "poi_restaurant_distance": 117,
+   "poi_school_distance": 276,
+   "poi_shop_distance": 928,
+   "poi_small_shop_distance": 126,
+   "poi_train_distance": 1577,
+   "poi_vet_distance": 89,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-10",
+    "seo_name": "bausava-market-s-r-o",
+    "ward_seo_name": "vrsovice"
+   },
+   "premise_id": 75107,
+   "premise_logo": "",
+   "price": 9199000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 9199000.0,
+   "price_czk_m2": 153317,
+   "price_summary": 9199000.0,
+   "price_summary_czk": 9199000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 313856
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_A/kcKfrMAkFMsuhQNPH77cky/294a.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_A/kcKfrMAkFMsuhQNPH77cky/294a.jpeg",
+     "restb_room_type": 4,
+     "room_type_confidence": 0.9160656929016113
+    }
+   ],
+   "advert_name": "Prodej bytu 3+kk 72 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+kk",
+    "value": 6
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": true,
+   "hash_id": 650870860,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Vinohrady",
+    "citypart_seo_name": "vinohrady",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 2",
+    "district_id": 5002,
+    "district_seo_name": "praha-2",
+    "entity_type": "address",
+    "geohash": "u2fkbknqsh",
+    "gps_lat": 50.0768221148848,
+    "gps_lon": 14.4338052431055,
+    "housenumber": "392",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 2",
+    "quarter_id": 88,
+    "quarter_seo_name": "praha-2",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Balbínova",
+    "street_id": 119249,
+    "street_seo_name": "balbinova",
+    "streetnumber": "4",
+    "ward": null,
+    "ward_id": 14967,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 35,
+   "poi_bus_public_transport_distance": 107,
+   "poi_kindergarten_distance": 155,
+   "poi_medic_distance": 94,
+   "poi_metro_distance": 270,
+   "poi_playground_distance": 610,
+   "poi_post_office_distance": 688,
+   "poi_restaurant_distance": 19,
+   "poi_school_distance": 74,
+   "poi_shop_distance": 814,
+   "poi_small_shop_distance": 86,
+   "poi_train_distance": 722,
+   "poi_vet_distance": 283,
+   "premise": {
+    "city_seo_name": "jesenice",
+    "quarter_seo_name": "",
+    "seo_name": "prodej-a-pronajem-nemovitosti-petra-faltysova",
+    "ward_seo_name": "jesenice"
+   },
+   "premise_id": 66693,
+   "premise_logo": "",
+   "price": 10990000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 10990000.0,
+   "price_czk_m2": 152639,
+   "price_summary": 10990000.0,
+   "price_summary_czk": 10990000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 280161
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_B/k0OqwCKRD1EvucrHvZb3H/34d5.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_B/k0OqwCKRD1EvucrHvZb3H/34d5.jpeg",
+     "restb_room_type": 15,
+     "room_type_confidence": 0.999729335308075
+    }
+   ],
+   "advert_name": "Prodej bytu 1+kk 27 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "1+kk",
+    "value": 2
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 1643130956,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Košíře",
+    "citypart_seo_name": "kosire",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhz7mhm3",
+    "gps_lat": 50.0723010713245,
+    "gps_lon": 14.3881974334549,
+    "housenumber": "801",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 5",
+    "quarter_id": 97,
+    "quarter_seo_name": "praha-5",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Holečkova",
+    "street_id": 119726,
+    "street_seo_name": "holeckova",
+    "streetnumber": "95",
+    "ward": null,
+    "ward_id": 13688,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 576,
+   "poi_bus_public_transport_distance": 124,
+   "poi_kindergarten_distance": 152,
+   "poi_medic_distance": 332,
+   "poi_metro_distance": 1132,
+   "poi_playground_distance": 193,
+   "poi_post_office_distance": 212,
+   "poi_restaurant_distance": 106,
+   "poi_school_distance": 331,
+   "poi_shop_distance": 979,
+   "poi_small_shop_distance": 24,
+   "poi_train_distance": 1873,
+   "poi_vet_distance": 970,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-4",
+    "seo_name": "coolpeople-invest",
+    "ward_seo_name": "krc"
+   },
+   "premise_id": 71799,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_QP_BL/9WZGLg.png",
+   "price": 5790000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 5790000.0,
+   "price_czk_m2": 214444,
+   "price_summary": 5790000.0,
+   "price_summary_czk": 5790000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 307988
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLChOIjXw6IB5diy/90a2.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLChOIjXw6IB5diy/90a2.jpeg",
+     "restb_room_type": 1,
+     "room_type_confidence": 0.9926831126213074
+    }
+   ],
+   "advert_name": "Prodej bytu 1+1 33 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "1+1",
+    "value": 3
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 400027724,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Hlubočepy",
+    "citypart_seo_name": "hlubocepy",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhxkcehy",
+    "gps_lat": 50.0364065412954,
+    "gps_lon": 14.383368306214008,
+    "housenumber": "608",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 5",
+    "quarter_id": 97,
+    "quarter_seo_name": "praha-5",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Pražského",
+    "street_id": 125149,
+    "street_seo_name": "prazskeho",
+    "streetnumber": "21",
+    "ward": null,
+    "ward_id": 13685,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 408,
+   "poi_bus_public_transport_distance": 28,
+   "poi_kindergarten_distance": 390,
+   "poi_medic_distance": 700,
+   "poi_metro_distance": 2187,
+   "poi_playground_distance": 50,
+   "poi_post_office_distance": 539,
+   "poi_restaurant_distance": 271,
+   "poi_school_distance": 336,
+   "poi_shop_distance": 2337,
+   "poi_small_shop_distance": 249,
+   "poi_train_distance": 892,
+   "poi_vet_distance": 852,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-6",
+    "seo_name": "realitni-makler-bc-petr-novotny",
+    "ward_seo_name": "dejvice"
+   },
+   "premise_id": 76498,
+   "premise_logo": "",
+   "price": 6099000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 6099000.0,
+   "price_czk_m2": 184818,
+   "price_summary": 6099000.0,
+   "price_summary_czk": 6099000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 18794
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_C/nCR9NVflLCsdQ6WH0IGh9WL/eb39.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_C/nCR9NVflLCsdQ6WH0IGh9WL/eb39.jpeg",
+     "restb_room_type": 1,
+     "room_type_confidence": 0.9965232610702515
+    }
+   ],
+   "advert_name": "Prodej bytu 3+1 61 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+1",
+    "value": 7
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 3248885836,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Střížkov",
+    "citypart_seo_name": "strizkov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 9",
+    "district_id": 5009,
+    "district_seo_name": "praha-9",
+    "entity_type": "address",
+    "geohash": "u2fm1svexj",
+    "gps_lat": 50.12438000067469,
+    "gps_lon": 14.487837937653135,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 9",
+    "quarter_id": 119,
+    "quarter_seo_name": "praha-9",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Rumburská",
+    "street_id": 121723,
+    "street_seo_name": "rumburska",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 14964,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 270,
+   "poi_bus_public_transport_distance": 143,
+   "poi_kindergarten_distance": 128,
+   "poi_medic_distance": 496,
+   "poi_metro_distance": 159,
+   "poi_playground_distance": 83,
+   "poi_post_office_distance": 718,
+   "poi_restaurant_distance": 113,
+   "poi_school_distance": 373,
+   "poi_shop_distance": 550,
+   "poi_small_shop_distance": 189,
+   "poi_train_distance": 1547,
+   "poi_vet_distance": 137,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-6",
+    "seo_name": "realitni-makler-bc-petr-novotny",
+    "ward_seo_name": "dejvice"
+   },
+   "premise_id": 76498,
+   "premise_logo": "",
+   "price": 7790000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 7790000.0,
+   "price_czk_m2": 127705,
+   "price_summary": 7790000.0,
+   "price_summary_czk": 7790000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 18794
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyCly89DL9H3Bjwx/c0d4.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyCly89DL9H3Bjwx/c0d4.jpeg",
+     "restb_room_type": 0,
+     "room_type_confidence": 0.699999988079071
+    }
+   ],
+   "advert_name": "Prodej bytu 3+kk 67 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+kk",
+    "value": 6
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 2896556108,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Nové Město",
+    "citypart_seo_name": "nove-mesto",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 1",
+    "district_id": 5001,
+    "district_seo_name": "praha-1",
+    "entity_type": "address",
+    "geohash": "u2fkbmsumc",
+    "gps_lat": 50.0846634641339,
+    "gps_lon": 14.4318234125605,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 1",
+    "quarter_id": 87,
+    "quarter_seo_name": "praha-1",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Jeruzalémská",
+    "street_id": 119901,
+    "street_seo_name": "jeruzalemska",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 14959,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 33,
+   "poi_bus_public_transport_distance": 132,
+   "poi_kindergarten_distance": 201,
+   "poi_medic_distance": 86,
+   "poi_metro_distance": 216,
+   "poi_playground_distance": 211,
+   "poi_post_office_distance": 272,
+   "poi_restaurant_distance": 61,
+   "poi_school_distance": 30,
+   "poi_shop_distance": 432,
+   "poi_small_shop_distance": 52,
+   "poi_train_distance": 396,
+   "poi_vet_distance": 501,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-3",
+    "seo_name": "psn-s-r-o",
+    "ward_seo_name": "zizkov"
+   },
+   "premise_id": 1160,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_oV_B/kObgaqJNMnB0llrZvCNlXm0/55a8.png",
+   "price": 17537000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 17537000.0,
+   "price_czk_m2": 261746,
+   "price_summary": 17537000.0,
+   "price_summary_czk": 17537000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 29442
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_C/nOdL4BtPEyD4lWfBNsHxt0ml/acc6.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_C/nOdL4BtPEyD4lWfBNsHxt0ml/acc6.jpeg",
+     "restb_room_type": 2,
+     "room_type_confidence": 0.9904060959815979
+    }
+   ],
+   "advert_name": "Prodej bytu 4+kk 108 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "4+kk",
+    "value": 8
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 128135244,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Vysočany",
+    "citypart_seo_name": "vysocany",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 9",
+    "district_id": 5009,
+    "district_seo_name": "praha-9",
+    "entity_type": "address",
+    "geohash": "u2fm41jce5",
+    "gps_lat": 50.103423,
+    "gps_lon": 14.50998,
+    "housenumber": "938",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 9",
+    "quarter_id": 119,
+    "quarter_seo_name": "praha-9",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Pod Harfou",
+    "street_id": 121382,
+    "street_seo_name": "pod-harfou",
+    "streetnumber": "40",
+    "ward": null,
+    "ward_id": 14969,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 663,
+   "poi_bus_public_transport_distance": 441,
+   "poi_kindergarten_distance": 247,
+   "poi_medic_distance": 636,
+   "poi_metro_distance": 840,
+   "poi_playground_distance": 99,
+   "poi_post_office_distance": 918,
+   "poi_restaurant_distance": 35,
+   "poi_school_distance": 245,
+   "poi_shop_distance": 231,
+   "poi_small_shop_distance": 89,
+   "poi_train_distance": 674,
+   "poi_vet_distance": 1176,
+   "premise": {
+    "city_seo_name": "nymburk",
+    "quarter_seo_name": "",
+    "seo_name": "dhz-servis",
+    "ward_seo_name": "drahelice"
+   },
+   "premise_id": 65966,
+   "premise_logo": "",
+   "price": 16850000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 16850000.0,
+   "price_czk_m2": 156019,
+   "price_summary": 16850000.0,
+   "price_summary_czk": 16850000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 277214
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_A/nCR9NVflLBkanYKacIAAfO4/e734.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_A/nCR9NVflLBkanYKacIAAfO4/e734.jpeg",
+     "restb_room_type": 2,
+     "room_type_confidence": 0.9330207109451294
+    }
+   ],
+   "advert_name": "Prodej bytu 3+kk 66 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+kk",
+    "value": 6
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": true,
+   "hash_id": 3458797644,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Smíchov",
+    "citypart_seo_name": "smichov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhzghpkz",
+    "gps_lat": 50.0714778114,
+    "gps_lon": 14.4087814886,
+    "housenumber": "947",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 5",
+    "quarter_id": 97,
+    "quarter_seo_name": "praha-5",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Svornosti",
+    "street_id": 122000,
+    "street_seo_name": "svornosti",
+    "streetnumber": "22",
+    "ward": null,
+    "ward_id": 13687,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 188,
+   "poi_bus_public_transport_distance": 319,
+   "poi_kindergarten_distance": 547,
+   "poi_medic_distance": 112,
+   "poi_metro_distance": 314,
+   "poi_playground_distance": 319,
+   "poi_post_office_distance": 488,
+   "poi_restaurant_distance": 67,
+   "poi_school_distance": 450,
+   "poi_shop_distance": 345,
+   "poi_small_shop_distance": 81,
+   "poi_train_distance": 1134,
+   "poi_vet_distance": 147,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-5",
+    "seo_name": "engel-volkers",
+    "ward_seo_name": "smichov"
+   },
+   "premise_id": 10628,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_QI_y/DbiKP5.png",
+   "price": 12985000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 12985000.0,
+   "price_czk_m2": 196742,
+   "price_summary": 12985000.0,
+   "price_summary_czk": 12985000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 308285
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_C/kPyfG4fPEeC2yv3C34IJDhIf/e4c4.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_C/kPyfG4fPEeC2yv3C34IJDhIf/e4c4.jpeg",
+     "restb_room_type": 28,
+     "room_type_confidence": 0.998933732509613
+    }
+   ],
+   "advert_name": "Prodej bytu 2+kk 57 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": true,
+   "hash_id": 1550389324,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Zbraslav",
+    "citypart_seo_name": "zbraslav",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhpr1jsz",
+    "gps_lat": 49.9613090742017,
+    "gps_lon": 14.3826845942038,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha-Zbraslav",
+    "quarter_id": 105,
+    "quarter_seo_name": "praha-zbraslav",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Pickova",
+    "street_id": 147217,
+    "street_seo_name": "pickova",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 13690,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 744,
+   "poi_bus_public_transport_distance": 270,
+   "poi_kindergarten_distance": 817,
+   "poi_medic_distance": 344,
+   "poi_metro_distance": 100000,
+   "poi_playground_distance": 432,
+   "poi_post_office_distance": 415,
+   "poi_restaurant_distance": 386,
+   "poi_school_distance": 708,
+   "poi_shop_distance": 5539,
+   "poi_small_shop_distance": 751,
+   "poi_train_distance": 1602,
+   "poi_vet_distance": 1802,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-4",
+    "seo_name": "ceskomoravska-realitni",
+    "ward_seo_name": "zabehlice"
+   },
+   "premise_id": 236,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_G_B/OVHD3s.png",
+   "price": 9199000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 9199000.0,
+   "price_czk_m2": 161386,
+   "price_summary": 9199000.0,
+   "price_summary_czk": 9199000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 9351
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLChOIjtwyIEp8dY/0fce.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLChOIjtwyIEp8dY/0fce.jpeg",
+     "restb_room_type": 1,
+     "room_type_confidence": 0.9928498268127441
+    }
+   ],
+   "advert_name": "Prodej bytu 2+kk 55 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 3530027084,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Žižkov",
+    "citypart_seo_name": "zizkov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 3",
+    "district_id": 5003,
+    "district_seo_name": "praha-3",
+    "entity_type": "address",
+    "geohash": "u2fkbvfhx2",
+    "gps_lat": 50.0860741,
+    "gps_lon": 14.4500899,
+    "housenumber": "728",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 3",
+    "quarter_id": 89,
+    "quarter_seo_name": "praha-3",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Dalimilova",
+    "street_id": 119466,
+    "street_seo_name": "dalimilova",
+    "streetnumber": "19",
+    "ward": null,
+    "ward_id": 14971,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 181,
+   "poi_bus_public_transport_distance": 194,
+   "poi_kindergarten_distance": 192,
+   "poi_medic_distance": 183,
+   "poi_metro_distance": 828,
+   "poi_playground_distance": 224,
+   "poi_post_office_distance": 1374,
+   "poi_restaurant_distance": 76,
+   "poi_school_distance": 47,
+   "poi_shop_distance": 1236,
+   "poi_small_shop_distance": 108,
+   "poi_train_distance": 1003,
+   "poi_vet_distance": 256,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-5",
+    "seo_name": "engel-volkers",
+    "ward_seo_name": "smichov"
+   },
+   "premise_id": 10628,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_QI_y/DbiKP5.png",
+   "price": 9940000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 9940000.0,
+   "price_czk_m2": 180727,
+   "price_summary": 9940000.0,
+   "price_summary_czk": 9940000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 149457
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyBHthwvRH2bHra/87be.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyBHthwvRH2bHra/87be.jpeg",
+     "restb_room_type": 5,
+     "room_type_confidence": 0.9335712194442749
+    }
+   ],
+   "advert_name": "Prodej bytu atypický 12 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "Atypický",
+    "value": 16
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 2488016972,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Vinohrady",
+    "citypart_seo_name": "vinohrady",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 3",
+    "district_id": 5003,
+    "district_seo_name": "praha-3",
+    "entity_type": "address",
+    "geohash": "u2fkbujh5s",
+    "gps_lat": 50.0763968,
+    "gps_lon": 14.45404,
+    "housenumber": "",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 3",
+    "quarter_id": 89,
+    "quarter_seo_name": "praha-3",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Perunova",
+    "street_id": 121308,
+    "street_seo_name": "perunova",
+    "streetnumber": "",
+    "ward": null,
+    "ward_id": 14967,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 38,
+   "poi_bus_public_transport_distance": 204,
+   "poi_kindergarten_distance": 101,
+   "poi_medic_distance": 224,
+   "poi_metro_distance": 215,
+   "poi_playground_distance": 244,
+   "poi_post_office_distance": 843,
+   "poi_restaurant_distance": 19,
+   "poi_school_distance": 101,
+   "poi_shop_distance": 1479,
+   "poi_small_shop_distance": 57,
+   "poi_train_distance": 1383,
+   "poi_vet_distance": 85,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-2",
+    "seo_name": "aedifico-club",
+    "ward_seo_name": "vinohrady"
+   },
+   "premise_id": 76696,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_of_A/nDJ4VEZEqB0riG8yFAMNwi/6ecb.png",
+   "price": 3920000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 3920000.0,
+   "price_czk_m2": 326667,
+   "price_summary": 3920000.0,
+   "price_summary_czk": 3920000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 321169
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qD_A/nO2CysqjGrScbvBdeHF3DV8/c57f.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qD_A/nO2CysqjGrScbvBdeHF3DV8/c57f.jpeg",
+     "restb_room_type": 0,
+     "room_type_confidence": 0.699999988079071
+    }
+   ],
+   "advert_name": "Prodej bytu 1+kk 43 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "1+kk",
+    "value": 2
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": true,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 2297159756,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Nové Město",
+    "citypart_seo_name": "nove-mesto",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 1",
+    "district_id": 5001,
+    "district_seo_name": "praha-1",
+    "entity_type": "address",
+    "geohash": "u2fkbqysw9",
+    "gps_lat": 50.0915728,
+    "gps_lon": 14.4342615,
+    "housenumber": "",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 1",
+    "quarter_id": 87,
+    "quarter_seo_name": "praha-1",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Petrská",
+    "street_id": 121316,
+    "street_seo_name": "petrska",
+    "streetnumber": "",
+    "ward": null,
+    "ward_id": 14959,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 35,
+   "poi_bus_public_transport_distance": 195,
+   "poi_kindergarten_distance": 154,
+   "poi_medic_distance": 88,
+   "poi_metro_distance": 204,
+   "poi_playground_distance": 376,
+   "poi_post_office_distance": 740,
+   "poi_restaurant_distance": 41,
+   "poi_school_distance": 109,
+   "poi_shop_distance": 227,
+   "poi_small_shop_distance": 257,
+   "poi_train_distance": 460,
+   "poi_vet_distance": 726,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-2",
+    "seo_name": "aedifico-club",
+    "ward_seo_name": "vinohrady"
+   },
+   "premise_id": 76696,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_of_A/nDJ4VEZEqB0riG8yFAMNwi/6ecb.png",
+   "price": 8500000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 8500000.0,
+   "price_czk_m2": 197674,
+   "price_summary": 8500000.0,
+   "price_summary_czk": 8500000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 321169
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_C/kPyfG4fPEeD7yCdHTuIJDiay/932a.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_C/kPyfG4fPEeD7yCdHTuIJDiay/932a.jpeg",
+     "restb_room_type": 5,
+     "room_type_confidence": 0.9999829530715942
+    }
+   ],
+   "advert_name": "Prodej bytu 2+kk 39 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 2671312972,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Uhříněves",
+    "citypart_seo_name": "uhrineves",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 10",
+    "district_id": 5010,
+    "district_seo_name": "praha-10",
+    "entity_type": "address",
+    "geohash": "u2fkshn0z0",
+    "gps_lat": 50.0318694087499,
+    "gps_lon": 14.5983841108396,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 22",
+    "quarter_id": 80,
+    "quarter_seo_name": "praha-22",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Přátelství",
+    "street_id": 124593,
+    "street_seo_name": "pratelstvi",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 11676,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 209,
+   "poi_bus_public_transport_distance": 68,
+   "poi_kindergarten_distance": 98,
+   "poi_medic_distance": 111,
+   "poi_metro_distance": 4921,
+   "poi_playground_distance": 42,
+   "poi_post_office_distance": 194,
+   "poi_restaurant_distance": 89,
+   "poi_school_distance": 398,
+   "poi_shop_distance": 2342,
+   "poi_small_shop_distance": 269,
+   "poi_train_distance": 442,
+   "poi_vet_distance": 192,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-4",
+    "seo_name": "tomas-vondracek-realitni-sluzby",
+    "ward_seo_name": "nusle"
+   },
+   "premise_id": 64797,
+   "premise_logo": "",
+   "price": 0.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 0.0,
+   "price_czk_m2": 0,
+   "price_summary": 0.0,
+   "price_summary_czk": 0.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 273038
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_A/nPYADvcUkmDOhBEILcHpsmdg/00ef.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_A/nPYADvcUkmDOhBEILcHpsmdg/00ef.jpeg",
+     "restb_room_type": 28,
+     "room_type_confidence": 0.9901538491249084
+    }
+   ],
+   "advert_name": "Prodej bytu 2+1 50 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+1",
+    "value": 5
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": true,
+   "hash_id": 1781518412,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Smíchov",
+    "citypart_seo_name": "smichov",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhzeb3k6",
+    "gps_lat": 50.07454,
+    "gps_lon": 14.392626,
+    "housenumber": "1090",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 5",
+    "quarter_id": 97,
+    "quarter_seo_name": "praha-5",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Švédská",
+    "street_id": 122090,
+    "street_seo_name": "svedska",
+    "streetnumber": "33",
+    "ward": null,
+    "ward_id": 13687,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 492,
+   "poi_bus_public_transport_distance": 171,
+   "poi_kindergarten_distance": 252,
+   "poi_medic_distance": 603,
+   "poi_metro_distance": 894,
+   "poi_playground_distance": 220,
+   "poi_post_office_distance": 615,
+   "poi_restaurant_distance": 149,
+   "poi_school_distance": 55,
+   "poi_shop_distance": 692,
+   "poi_small_shop_distance": 64,
+   "poi_train_distance": 1843,
+   "poi_vet_distance": 893,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-20",
+    "seo_name": "remax-horizont",
+    "ward_seo_name": "horni-pocernice"
+   },
+   "premise_id": 19483,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_qB_A/nCTUX1iX5CDciVBrAqGnPwqP/7c7d.png",
+   "price": 9990000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 9990000.0,
+   "price_czk_m2": 199800,
+   "price_summary": 9990000.0,
+   "price_summary_czk": 9990000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 253436
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_B/kcKfrMAkFnIwlr5EIDt7qC/b017.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_B/kcKfrMAkFnIwlr5EIDt7qC/b017.jpeg",
+     "restb_room_type": 29,
+     "room_type_confidence": 0.963518500328064
+    }
+   ],
+   "advert_name": "Prodej bytu 1+kk 16 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "1+kk",
+    "value": 2
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 3018207308,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Ruzyně",
+    "citypart_seo_name": "ruzyne",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 6",
+    "district_id": 5006,
+    "district_seo_name": "praha-6",
+    "entity_type": "address",
+    "geohash": "u2fhvkrvxh",
+    "gps_lat": 50.0780235126135,
+    "gps_lon": 14.3041624969992,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 6",
+    "quarter_id": 107,
+    "quarter_seo_name": "praha-6",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Zbuzanská",
+    "street_id": 122882,
+    "street_seo_name": "zbuzanska",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 13693,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 405,
+   "poi_bus_public_transport_distance": 53,
+   "poi_kindergarten_distance": 894,
+   "poi_medic_distance": 855,
+   "poi_metro_distance": 2521,
+   "poi_playground_distance": 466,
+   "poi_post_office_distance": 1413,
+   "poi_restaurant_distance": 191,
+   "poi_school_distance": 931,
+   "poi_shop_distance": 1339,
+   "poi_small_shop_distance": 850,
+   "poi_train_distance": 714,
+   "poi_vet_distance": 500,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-2",
+    "seo_name": "hvb-real-estate-s-r-o",
+    "ward_seo_name": "vinohrady"
+   },
+   "premise_id": 6658,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_G_C/GqaBvgk.png",
+   "price": 3690000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 3690000.0,
+   "price_czk_m2": 230625,
+   "price_summary": 3690000.0,
+   "price_summary_czk": 3690000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 280359
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLBkdq1fjQIEpHNh/6d31.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLBkdq1fjQIEpHNh/6d31.jpeg",
+     "restb_room_type": 0,
+     "room_type_confidence": 0.699999988079071
+    }
+   ],
+   "advert_name": "Prodej bytu atypický 16 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "Atypický",
+    "value": 16
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 4093710412,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Vinohrady",
+    "citypart_seo_name": "vinohrady",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 3",
+    "district_id": 5003,
+    "district_seo_name": "praha-3",
+    "entity_type": "address",
+    "geohash": "u2fkbusyvs",
+    "gps_lat": 50.0796149394755,
+    "gps_lon": 14.4537871830393,
+    "housenumber": null,
+    "inaccuracy_type": "street",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 3",
+    "quarter_id": 89,
+    "quarter_seo_name": "praha-3",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Jagellonská",
+    "street_id": 119853,
+    "street_seo_name": "jagellonska",
+    "streetnumber": null,
+    "ward": null,
+    "ward_id": 14967,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 239,
+   "poi_bus_public_transport_distance": 393,
+   "poi_kindergarten_distance": 392,
+   "poi_medic_distance": 106,
+   "poi_metro_distance": 348,
+   "poi_playground_distance": 117,
+   "poi_post_office_distance": 1002,
+   "poi_restaurant_distance": 39,
+   "poi_school_distance": 211,
+   "poi_shop_distance": 1705,
+   "poi_small_shop_distance": 46,
+   "poi_train_distance": 1277,
+   "poi_vet_distance": 75,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-2",
+    "seo_name": "hvb-real-estate-s-r-o",
+    "ward_seo_name": "vinohrady"
+   },
+   "premise_id": 6658,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_G_C/GqaBvgk.png",
+   "price": 1790000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 1790000.0,
+   "price_czk_m2": 111875,
+   "price_summary": 1790000.0,
+   "price_summary_czk": 1790000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 280359
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_A/kPVqmweP7JCNF9HB9WHp4KF5/6afd.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_A/kPVqmweP7JCNF9HB9WHp4KF5/6afd.jpeg",
+     "restb_room_type": 28,
+     "room_type_confidence": 0.9252694249153137
+    }
+   ],
+   "advert_name": "Prodej bytu 2+kk 53 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 4223283276,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Hlubočepy",
+    "citypart_seo_name": "hlubocepy",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 5",
+    "district_id": 5005,
+    "district_seo_name": "praha-5",
+    "entity_type": "address",
+    "geohash": "u2fhwgsgrx",
+    "gps_lat": 50.0295876538974,
+    "gps_lon": 14.365984496294,
+    "housenumber": "1130",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 5",
+    "quarter_id": 97,
+    "quarter_seo_name": "praha-5",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Voskovcova",
+    "street_id": 123576,
+    "street_seo_name": "voskovcova",
+    "streetnumber": "26",
+    "ward": null,
+    "ward_id": 13685,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 656,
+   "poi_bus_public_transport_distance": 166,
+   "poi_kindergarten_distance": 251,
+   "poi_medic_distance": 755,
+   "poi_metro_distance": 2529,
+   "poi_playground_distance": 141,
+   "poi_post_office_distance": 107,
+   "poi_restaurant_distance": 39,
+   "poi_school_distance": 205,
+   "poi_shop_distance": 1091,
+   "poi_small_shop_distance": 58,
+   "poi_train_distance": 1302,
+   "poi_vet_distance": 133,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-1",
+    "seo_name": "bidli-reality",
+    "ward_seo_name": "nove-mesto"
+   },
+   "premise_id": 17843,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_gT_3/s05Dpl.png",
+   "price": 8490000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 8490000.0,
+   "price_czk_m2": 160189,
+   "price_summary": 8490000.0,
+   "price_summary_czk": 8490000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 91033
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyC2Er4V5H1VebT/67fa.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qF_D/nOdL4BtPEyC2Er4V5H1VebT/67fa.jpeg",
+     "restb_room_type": 15,
+     "room_type_confidence": 0.9031015634536743
+    }
+   ],
+   "advert_name": "Prodej bytu 2+kk 28 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 2205032524,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Nusle",
+    "citypart_seo_name": "nusle",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 4",
+    "district_id": 5004,
+    "district_seo_name": "praha-4",
+    "entity_type": "address",
+    "geohash": "u2fkb9gvyt",
+    "gps_lat": 50.0643413779231,
+    "gps_lon": 14.4414708343643,
+    "housenumber": "363",
+    "inaccuracy_type": "address",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 4",
+    "quarter_id": 90,
+    "quarter_seo_name": "praha-4",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "náměstí Bratří Synků",
+    "street_id": 122003,
+    "street_seo_name": "namesti-bratri-synku",
+    "streetnumber": "6",
+    "ward": null,
+    "ward_id": 14960,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 53,
+   "poi_bus_public_transport_distance": 636,
+   "poi_kindergarten_distance": 306,
+   "poi_medic_distance": 150,
+   "poi_metro_distance": 782,
+   "poi_playground_distance": 300,
+   "poi_post_office_distance": 264,
+   "poi_restaurant_distance": 13,
+   "poi_school_distance": 202,
+   "poi_shop_distance": 1501,
+   "poi_small_shop_distance": 19,
+   "poi_train_distance": 450,
+   "poi_vet_distance": 308,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-4",
+    "seo_name": "coolpeople-invest",
+    "ward_seo_name": "krc"
+   },
+   "premise_id": 71799,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_QP_BL/9WZGLg.png",
+   "price": 5900000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 5900000.0,
+   "price_czk_m2": 210714,
+   "price_summary": 5900000.0,
+   "price_summary_czk": 5900000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 307988
+  },
+  {
+   "advert_images": [
+    "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLBkdq1fjkIEqNT6/4102.jpeg"
+   ],
+   "advert_images_all": [
+    {
+     "advert_image_sdn_url": "//d18-a.sdn.cz/d_18/c_img_qG_B/nCR9NVflLBkdq1fjkIEqNT6/4102.jpeg",
+     "restb_room_type": 1,
+     "room_type_confidence": 0.8323275446891785
+    }
+   ],
+   "advert_name": "Prodej bytu 3+kk 151 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "3+kk",
+    "value": 6
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "discount_show": false,
+   "has_matterport_url": false,
+   "has_video": false,
+   "hash_id": 605098060,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Libeň",
+    "citypart_seo_name": "liben",
+    "country": "Česká republika",
+    "country_id": 112,
+    "country_seo_name": "ceska-republika",
+    "district": "Praha 8",
+    "district_id": 5008,
+    "district_seo_name": "praha-8",
+    "entity_type": "address",
+    "geohash": "u2fm0uk8zv",
+    "gps_lat": 50.1211597458,
+    "gps_lon": 14.453536782,
+    "housenumber": "923",
+    "inaccuracy_type": "gps",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 8",
+    "quarter_id": 115,
+    "quarter_seo_name": "praha-8",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "U Vlachovky",
+    "street_id": 122443,
+    "street_seo_name": "u-vlachovky",
+    "streetnumber": "2",
+    "ward": null,
+    "ward_id": 14955,
+    "ward_seo_name": null
+   },
+   "poi_atm_distance": 184,
+   "poi_bus_public_transport_distance": 222,
+   "poi_kindergarten_distance": 500,
+   "poi_medic_distance": 183,
+   "poi_metro_distance": 255,
+   "poi_playground_distance": 132,
+   "poi_post_office_distance": 1383,
+   "poi_restaurant_distance": 73,
+   "poi_school_distance": 367,
+   "poi_shop_distance": 1280,
+   "poi_small_shop_distance": 181,
+   "poi_train_distance": 1530,
+   "poi_vet_distance": 553,
+   "premise": {
+    "city_seo_name": "praha",
+    "quarter_seo_name": "praha-5",
+    "seo_name": "engel-volkers",
+    "ward_seo_name": "smichov"
+   },
+   "premise_id": 10628,
+   "premise_logo": "https://d48-a.sdn.cz/d_48/c_img_QI_y/DbiKP5.png",
+   "price": 14850000.0,
+   "price_currency_cb": {
+    "name": "Kč",
+    "value": 1
+   },
+   "price_czk": 14850000.0,
+   "price_czk_m2": 98344,
+   "price_summary": 14850000.0,
+   "price_summary_czk": 14850000.0,
+   "price_summary_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "price_unit_cb": {
+    "name": "za nemovitost",
+    "value": 1
+   },
+   "user_id": 149457
+  }
+ ],
+ "search_title": "Byty na prodej Praha",
+ "status_code": 200,
+ "status_message": "OK"
+}
