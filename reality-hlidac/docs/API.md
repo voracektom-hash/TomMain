@@ -156,6 +156,10 @@ Sreality JSON API zavřela.
 
 ## 7. Doporučená strategie pro watcher
 
+- **Měření churnu** (21. 10. 2026, 22:10–22:16 SELČ, 7 pollů po 60 s, limit 60): za 6 minut
+  přibyl 1 nový/upravený inzerát (pozice 0), 0 změn ceny. (Spekulace) Přes den to bude spíš
+  5–20 za minutu, takže limit 60 má rezervu 3×. Když nová stránka nemá **žádný** překryv
+  s předchozí, watcher si dočte další stránku (offset 60), aby o nic nepřišel.
 - **1 request / 60 s ±10 s:** `search?...&locality_region_id=10,11&sort=-date&limit=60`, gzip.
 - Nové `hash_id` uložit. Známé `hash_id` se změněnou cenou zaznamenat jako změnu ceny.
 - Detail jen pro kandidáty, kteří projdou levným filtrem.
