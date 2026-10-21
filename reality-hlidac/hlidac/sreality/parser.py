@@ -12,6 +12,9 @@ from dataclasses import dataclass
 # "Prodej bytu 2+kk 54 m²" – \s also matches the non-breaking space.
 AREA_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*m²")
 
+# Agents enter placeholder prices like 1 Kč for "price on request".
+MIN_REAL_PRICE_CZK = 10_000
+
 # Any valid disposition works in the URL; Sreality redirects to the canonical one.
 URL_TEMPLATE = "https://www.sreality.cz/detail/prodej/byt/2+kk/x/{id}"
 
@@ -104,7 +107,9 @@ def parse_listing(item: dict) -> Listing:
         raise ParseError(f"listing is missing a required field: {exc}") from exc
 
     area = parse_area(name)
-    price = _int(item.get("price_czk")) or None  # 0 means "price on request"
+    price = _int(item.get("price_czk"))
+    if price is not None and price < MIN_REAL_PRICE_CZK:  # 0 or 1 Kč = price on request
+        price = None
     price_m2 = _int(item.get("price_czk_m2")) or None
     if price and not price_m2 and area:
         price_m2 = round(price / area)

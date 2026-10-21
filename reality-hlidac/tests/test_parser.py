@@ -90,3 +90,11 @@ def test_detail_not_found_raises():
 def test_broken_search_raises(payload):
     with pytest.raises(ParseError):
         parse_search(payload)
+
+
+def test_placeholder_price_is_price_on_request():
+    data = load_fixture("search_edge_cases.json")
+    data["results"][1]["price_czk"] = 1.0
+    _, listings = parse_search(data)
+    assert listings[1].price_czk is None
+    assert listings[1].price_m2 is None
