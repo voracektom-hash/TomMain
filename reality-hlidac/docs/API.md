@@ -126,6 +126,30 @@ V položce seznamu je lokalita jako text i ID. Pravidla budeme párovat **podle 
 Pozor: `district` v Praze je starý okres (Praha 1–10), např. Chodov má `district = "Praha 4"`,
 ale `quarter = "Praha 11"`. Pro „Praha 1–22“ používáme **`quarter`**.
 
+### ⚠️ Nepřesná lokalita (`quarter` chybí)
+
+Když makléř zadá jen část obce bez ulice (`inaccuracy_type: "ward"`), chybí správní obvod:
+
+```json
+"citypart": "Vinohrady", "district": "Praha 1",
+"quarter": null, "quarter_id": -1, "street": "", "inaccuracy_type": "ward"
+```
+
+`district: "Praha 1"` je tady zjevně nesmysl, protože Vinohrady leží v Praze 2, 3 a 10. Pravidlo
+pro „Praha 2“ proto při chybějícím `quarter` porovnává **`citypart` se statickou tabulkou
+části → obvody** (Vinohrady → Praha 2, 3, 10). Shoda s kterýmkoli obvodem = projde. Je to radši
+falešně pozitivní SMS než zmeškaný byt.
+
+### Soukromý prodejce / cena na dotaz
+
+```json
+"price_czk": 0.0, "price_czk_m2": 0, "premise_id": null, "user_id": null
+```
+
+- `premise_id: null` znamená inzerát bez RK. V SMS bude místo makléře uvedeno „soukromy“, pokud detail nedá jméno.
+- `price_czk: 0` znamená cenu na dotaz. Do mediánů se nezapočítává a pravidla s max. cenou ho nepustí.
+  (Volitelně do budoucna: přepínač „i cena na dotaz“.)
+
 **Našeptávač:** `GET /api/v1/localities/suggest?phrase=Smichov&lang=cs` vrací obce
 (`municipality_cz`) a části (`ward_cz`) s ID a krajem. V appce ale budeme našeptávat
 z vlastní DB (lokality, které jsme už viděli) a ze statického seznamu, bez dalších requestů na Sreality.
