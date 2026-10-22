@@ -41,6 +41,7 @@ class Listing:
     lon: float | None
     premise_id: int | None  # real estate agency; None = private seller
     user_id: int | None
+    image_url: str | None = None
 
     @property
     def is_private(self) -> bool:
@@ -120,6 +121,11 @@ def parse_listing(item: dict) -> Listing:
     if _int(loc.get("quarter_id")) == -1:
         quarter = None
 
+    images = item.get("advert_images") or []
+    image = images[0] if images and isinstance(images[0], str) else None
+    if image and image.startswith("//"):
+        image = "https:" + image
+
     sub = item.get("category_sub_cb") or {}
     return Listing(
         id=listing_id,
@@ -138,6 +144,7 @@ def parse_listing(item: dict) -> Listing:
         lon=loc.get("gps_lon"),
         premise_id=_int(item.get("premise_id")),
         user_id=_int(item.get("user_id")),
+        image_url=image,
     )
 
 

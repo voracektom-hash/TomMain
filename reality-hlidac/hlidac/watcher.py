@@ -16,12 +16,17 @@ from datetime import datetime, timedelta
 from typing import Callable
 
 from hlidac import config, db, medians, schedule
+from hlidac.alerts import AlertEngine, Channel
+from hlidac.notify.console import ConsoleNotifier
+from hlidac.notify.ntfy import NtfyNotifier
+from hlidac.rules import load_rules
 from hlidac.sreality.client import RateLimited, SrealityClient, SrealityError
 from hlidac.sreality.parser import Listing, ParseError, parse_search
 
 log = logging.getLogger("hlidac")
 
-MAX_PAGES_PER_POLL = 5        # catch-up limit when a page has no known listing
+MAX_PAGES_PER_POLL = 40       # catch-up limit after downtime (40 × 60 = 2 400 listings)
+CAUGHT_UP_OVERLAP = 3         # this many listings from the previous poll = nothing newer left
 SWEEP_PAGE_LIMIT = 200
 SWEEP_PAUSE_S = 10            # be gentle: one sweep request every 10 s
 SWEEP_EVERY = timedelta(days=7)
@@ -70,8 +75,10 @@ class Watcher:
     def __init__(self, conn: sqlite3.Connection, client: SrealityClient, cfg: config.Config,
                  *, now: Callable[[], datetime] = db.utcnow,
                  sleep: Callable[[float], None] = time.sleep,
-                 rng: random.Random | None = None):
+                 rng: random.Random | None = None, alerts: AlertEngine | None = None):
         self.conn = conn
+        self.alerts = alerts
+        self.prev_ids: set[int] | None = None
         self.client = client
         self.cfg = cfg
         self.now = now
@@ -82,15 +89,25 @@ class Watcher:
         self.medians_at: datetime | None = None
         self.rates: schedule.Rates | None = None
         self.rates_at: datetime | None = None
+        self.expected_interval: float = schedule.FAST_S
 
     # --- one poll -------------------------------------------------------------------------
 
     def poll_once(self) -> PollResult:
+        """Fetch the newest listings. The list is sorted by *edit* time, so we read pages
+        until we meet listings seen in the previous poll – everything above them is newer."""
         started = self.now()
         result = PollResult(0, [], [], 0)
         sweep_done = db.get_meta(self.conn, "sweep_done") is not None
+        prev = self._previous_ids()
+        seen: set[int] = set()
         try:
             for page in range(MAX_PAGES_PER_POLL):
+                if page:
+                    if page == 1:
+                        log.info("Dohánění: na první stránce nejsou inzeráty z minulé kontroly, "
+                                 "čtu další stránky…")
+                    self.sleep(SWEEP_PAUSE_S)
                 data = self.client.search(self.cfg.region_ids, page * self.cfg.page_limit,
                                           self.cfg.page_limit)
                 total, listings = parse_search(data)
@@ -101,20 +118,34 @@ class Watcher:
                 result.n_results += len(listings)
                 result.new += up.new
                 result.price_changes += up.price_changes
-                # Some listing on this page was already known -> we have caught up.
-                if up.known_count or not sweep_done:
+                ids = {l.id for l in listings}
+                seen |= ids
+                caught_up = len(ids & prev) >= min(CAUGHT_UP_OVERLAP, len(prev))
+                if caught_up or not sweep_done or (page + 1) * self.cfg.page_limit >= total:
                     break
             else:
-                log.warning("Ani po %d stránkách žádný známý inzerát – část nových mohla uniknout",
-                            MAX_PAGES_PER_POLL)
+                log.warning("Ani po %d stránkách jsem nedohnal minulou kontrolu – "
+                            "část nových inzerátů mohla uniknout", MAX_PAGES_PER_POLL)
         except Exception as exc:
             db.record_run(self.conn, "poll", started, self.now(), False, pages=result.pages,
                           error=f"{type(exc).__name__}: {exc}")
             raise
+        self.prev_ids = seen
         db.record_run(self.conn, "poll", started, self.now(), True,
                       n_results=result.n_results, n_new=len(result.new),
                       n_price_changes=len(result.price_changes), pages=result.pages)
         return result
+
+    def _previous_ids(self) -> set[int]:
+        """IDs seen in the last successful run (from memory, or from the DB after a restart)."""
+        if self.prev_ids is not None:
+            return self.prev_ids
+        row = self.conn.execute(
+            "SELECT MAX(started_at) FROM runs WHERE ok = 1").fetchone()
+        if not row or not row[0]:
+            return set()
+        return {r[0] for r in self.conn.execute(
+            "SELECT id FROM listings WHERE last_seen >= ?", (row[0],))}
 
     # --- full sweep -----------------------------------------------------------------------
 
@@ -145,6 +176,7 @@ class Watcher:
         db.record_run(self.conn, "sweep", started, self.now(), True, n_results=total or 0,
                       n_new=n_new, pages=pages)
         db.set_meta(self.conn, "sweep_done", db.ts(self.now()))
+        self.prev_ids = None  # next poll compares against what the sweep saw
         log.info("%s: hotovo – %d inzerátů, %d nově uložených, %d staženo z nabídky",
                  label, total or 0, n_new, removed)
 
@@ -163,7 +195,12 @@ class Watcher:
         if self.rates_at is None or now - self.rates_at >= MEDIANS_EVERY:
             self.rates = schedule.learn_rates(self.conn, now)
             self.rates_at = now
-        delay = schedule.with_jitter(schedule.base_interval(now, self.rates), self.rng)
+        base = schedule.base_interval(now, self.rates)
+        rules = load_rules(self.conn)
+        if rules and all(r.is_quiet(now) for r in rules):
+            base = max(base, schedule.SLOW_S)  # nothing would be sent now anyway
+        self.expected_interval = base
+        delay = schedule.with_jitter(base, self.rng)
         if self.slowdown_until and now < self.slowdown_until:
             delay *= SLOWDOWN_FACTOR
         if self.failures:
@@ -179,6 +216,7 @@ class Watcher:
 
     def step(self) -> float:
         """One iteration of the loop. Returns how long to sleep before the next one."""
+        error: Exception | None = None
         try:
             if self.sweep_due():
                 first = db.get_meta(self.conn, "sweep_done") is None
@@ -188,22 +226,31 @@ class Watcher:
             for l in result.new:
                 log.info("Nový: %s", describe(l))
             for ch in result.price_changes:
-                log.info("Změna ceny: %s → %s (%+.1f %%) | %s", fmt_price(ch.old_price),
-                         fmt_price(ch.new_price), ch.percent, describe(ch.listing))
+                log.info("Změna ceny: %s → %s (%s %%) | %s", fmt_price(ch.old_price),
+                         fmt_price(ch.new_price), f"{ch.percent:+.1f}".replace(".", ","),
+                         describe(ch.listing))
             self.maybe_compute_medians()
+            if self.alerts:
+                self.alerts.process(result.new, result.price_changes, self.now())
         except RateLimited as exc:
+            error = exc
             self.failures += 1
             self.slowdown_until = self.now() + SLOWDOWN_FOR
             log.warning("Sreality nás brzdí (%s) – zpomaluji %d× na %d min",
                         exc, SLOWDOWN_FACTOR, SLOWDOWN_FOR.seconds // 60)
         except ParseError as exc:
+            error = exc
             self.failures += 1
             log.error("Odpověď Sreality má nečekaný tvar – možná změna API: %s", exc)
         except SrealityError as exc:
+            error = exc
             self.failures += 1
             log.warning("Chyba spojení se Sreality (%d. v řadě): %s", self.failures, exc)
 
         delay = self.next_delay()
+        if self.alerts:
+            self.alerts.dispatch(self.now())
+            self.alerts.watchdog(self.now(), error, self.expected_interval)
         log.debug("Další kontrola za %.0f s", delay)
         return delay
 
@@ -224,13 +271,38 @@ class Watcher:
             self.sleep(delay)
 
 
+def build_channels(cfg: config.Config) -> list[Channel]:
+    channels = []
+    for name in cfg.notify_channels:
+        if name == "ntfy":
+            if not cfg.ntfy_topics:
+                log.warning("Kanál ntfy je zapnutý, ale chybí NTFY_TOPICS – vynechávám")
+                continue
+            channels.append(Channel(NtfyNotifier(cfg.ntfy_server, cfg.ntfy_token),
+                                    list(cfg.ntfy_topics)))
+        elif name == "sms":
+            if cfg.sms_provider != "console":
+                log.warning("SMS provider „%s“ zatím není implementovaný – používám console",
+                            cfg.sms_provider)
+            channels.append(Channel(ConsoleNotifier("sms"), list(cfg.sms_recipients) or ["test"]))
+        elif name == "console":
+            channels.append(Channel(ConsoleNotifier(), ["log"]))
+        else:
+            log.warning("Neznámý kanál „%s“ – vynechávám", name)
+    return channels
+
+
 def main() -> None:
     cfg = config.load()
     config.setup_logging(cfg.log_level)
     # Docker stops containers with SIGTERM – exit cleanly instead of being killed.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     conn = db.connect(cfg.db_path)
-    watcher = Watcher(conn, SrealityClient(cfg.user_agent), cfg)
+    client = SrealityClient(cfg.user_agent)
+    channels = build_channels(cfg)
+    log.info("Kanály: %s", ", ".join(f"{c.notifier.channel} ({len(c.recipients)} příjemců)"
+                                       for c in channels) or "žádné")
+    watcher = Watcher(conn, client, cfg, alerts=AlertEngine(conn, client, channels))
     try:
         watcher.run_forever()
     except (KeyboardInterrupt, SystemExit):

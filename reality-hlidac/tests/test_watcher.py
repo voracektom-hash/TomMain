@@ -179,3 +179,25 @@ def test_medians(conn):
                        " AND disposition=''").fetchone()
     assert row["n"] == 21  # 22 listings, one with price on request
     assert 100_000 < row["median_m2"] < 300_000
+
+
+def test_catch_up_ignores_bumped_old_listings(conn):
+    """Page 1 has new listings mixed with OLD listings that were just edited (known, but not
+    from the previous poll). We must keep reading until we meet the previous poll's IDs."""
+    all_items = items()
+    w, _ = make(conn, [page(all_items)])
+    w.sweep(initial=True)
+    w.client.pages = [page(all_items[:5], total=1000)]
+    w.poll_once()  # previous poll saw items 0–4
+
+    def fresh(i):
+        it = copy.deepcopy(all_items[0])
+        it["hash_id"] = 10_000 + i
+        return it
+
+    page1 = [fresh(1), fresh(2), fresh(3)] + all_items[10:13]   # bumped old ones
+    page2 = [fresh(4), fresh(5)] + all_items[:5]
+    w.client.pages = [page(page1, total=1000), page(page2, total=1000)]
+    result = w.poll_once()
+    assert result.pages == 2
+    assert sorted(l.id for l in result.new) == [10_001, 10_002, 10_003, 10_004, 10_005]

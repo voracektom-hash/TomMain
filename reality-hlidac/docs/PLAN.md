@@ -4,9 +4,9 @@
 
 | Fáze | Výstup | Stav |
 |---|---|---|
-| 0 — Zjištění API | `docs/API.md`, uložené ukázkové odpovědi v `tests/fixtures/` | ⛔ blokováno (síť) |
-| 1 — Watcher | poller 60 s ±10 s, SQLite, deduplikace, historie cen, mediány 90 dní | čeká |
-| 2 — Pravidla + SMS | filtr pravidel, SMSbrána.cz + console provider, tichý režim, watchdog | čeká |
+| 0 — Zjištění API | `docs/API.md`, uložené ukázkové odpovědi v `tests/fixtures/` | ✅ hotovo |
+| 1 — Watcher | adaptivní poller (60 s ±10 s přes den), SQLite, historie cen, mediány 90 dní | ✅ hotovo |
+| 2 — Pravidla + notifikace | filtr pravidel, ntfy push + SMS (console; SMSbrána později), tichý režim, watchdog | ✅ hotovo (bez SMSbrány) |
 | 3 — Appka | FastAPI + Jinja2 + HTMX, PWA, 6 obrazovek + mediány | čeká |
 | 4 — Nasazení | Docker Compose, Tailscale, zálohy, `docs/NASAZENI.md` | čeká |
 
@@ -49,11 +49,14 @@ reality-hlidac/
 │   ├── locations.py          # číselník lokalit (Praha 1–22, části, obce)
 │   ├── medians.py            # rolling medián Kč/m² (90 dní)
 │   ├── rules.py              # vyhodnocení pravidel
-│   ├── sms/
-│   │   ├── base.py           # abstrakce providera
-│   │   ├── smsbrana.py
-│   │   ├── console.py
-│   │   └── format.py         # ASCII, ≤160 znaků
+│   ├── alerts.py             # shoda → detail → fronta → odeslání, watchdog
+│   ├── rules_cli.py          # import / výpis / náhled pravidel z příkazové řádky
+│   ├── text.py               # diakritika, hledání slov ve všech tvarech
+│   ├── notify/
+│   │   ├── base.py           # abstrakce kanálu
+│   │   ├── ntfy.py           # push notifikace
+│   │   ├── console.py        # výpis do logu (i jako SMS náhrada)
+│   │   └── format.py         # texty: push s diakritikou, SMS ASCII ≤ 2 segmenty
 │   ├── watcher.py            # hlavní smyčka + watchdog
 │   └── web/
 │       ├── app.py            # FastAPI routy
@@ -65,5 +68,7 @@ reality-hlidac/
     ├── fixtures/             # uložené JSON odpovědi Sreality
     ├── test_parser.py
     ├── test_rules.py
+    ├── test_alerts.py
+    ├── test_watcher.py
     └── test_sms_format.py
 ```

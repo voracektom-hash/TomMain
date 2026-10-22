@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS listings (
     since       TEXT,                  -- publication date from detail (phase 2)
     removed_at  TEXT                   -- set when a full sweep no longer finds it
 );
+CREATE INDEX IF NOT EXISTS idx_listings_gps ON listings(lat, lon);
 CREATE INDEX IF NOT EXISTS idx_listings_first_seen ON listings(first_seen);
 CREATE INDEX IF NOT EXISTS idx_listings_last_seen ON listings(last_seen);
 
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS runs (
 CREATE INDEX IF NOT EXISTS idx_runs_started ON runs(started_at);
 
 CREATE TABLE IF NOT EXISTS medians (
-    scope       TEXT NOT NULL,         -- 'quarter', 'citypart' or 'city'
+    scope       TEXT NOT NULL,         -- 'quarter', 'citypart', 'city' or 'district'
     location    TEXT NOT NULL,
     disposition TEXT NOT NULL,         -- '' = all dispositions
     median_m2   INTEGER NOT NULL,
@@ -71,6 +72,66 @@ CREATE TABLE IF NOT EXISTS medians (
     computed_at TEXT NOT NULL,
     PRIMARY KEY (scope, location, disposition)
 );
+
+CREATE TABLE IF NOT EXISTS listing_details (
+    listing_id    INTEGER PRIMARY KEY REFERENCES listings(id),
+    fetched_at    TEXT NOT NULL,
+    since         TEXT,
+    floor         INTEGER,             -- 1 = ground floor (1. NP), -1 = basement
+    floors_total  INTEGER,
+    ownership     TEXT,
+    usable_area   REAL,
+    description   TEXT,
+    broker_name   TEXT,
+    broker_phone  TEXT,
+    broker_email  TEXT,
+    agency        TEXT
+);
+
+CREATE TABLE IF NOT EXISTS rules (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    name                TEXT NOT NULL UNIQUE,
+    active              INTEGER NOT NULL DEFAULT 1,
+    location_type       TEXT NOT NULL,     -- 'quarter', 'citypart' or 'city'
+    location            TEXT NOT NULL,
+    max_price           INTEGER,
+    max_price_m2        INTEGER,
+    min_area            REAL,
+    max_area            REAL,
+    dispositions        TEXT NOT NULL DEFAULT '[]',   -- JSON list, empty = any
+    ownerships          TEXT NOT NULL DEFAULT '[]',   -- JSON list, empty = any
+    min_floor           INTEGER,
+    no_ground_floor     INTEGER NOT NULL DEFAULT 0,
+    min_below_median    REAL,              -- percent
+    exclude_keywords    TEXT NOT NULL DEFAULT '[]',   -- JSON list
+    quiet_start         INTEGER,           -- hour 0-23, NULL = no quiet mode
+    quiet_end           INTEGER,
+    quiet_action        TEXT NOT NULL DEFAULT 'defer',  -- 'defer' (send in the morning) or 'drop'
+    price_drop_alert    INTEGER NOT NULL DEFAULT 0,
+    created_at          TEXT NOT NULL,
+    updated_at          TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS alerts (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind        TEXT NOT NULL,             -- 'new', 'price_drop' or 'service'
+    listing_id  INTEGER REFERENCES listings(id),
+    price       INTEGER,                   -- listing price at alert time (dedup of price drops)
+    rule_names  TEXT NOT NULL DEFAULT '',
+    channel     TEXT NOT NULL,             -- 'ntfy', 'sms', 'console'
+    recipient   TEXT NOT NULL,
+    title       TEXT NOT NULL DEFAULT '',
+    body        TEXT NOT NULL,             -- full text actually sent
+    payload     TEXT,                      -- JSON with extra fields (url, image, phone)
+    status      TEXT NOT NULL,             -- 'queued', 'sent', 'failed', 'dropped'
+    send_after  TEXT NOT NULL,
+    attempts    INTEGER NOT NULL DEFAULT 0,
+    error       TEXT,
+    created_at  TEXT NOT NULL,
+    sent_at     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status, send_after);
+CREATE INDEX IF NOT EXISTS idx_alerts_listing ON alerts(listing_id, kind);
 
 CREATE TABLE IF NOT EXISTS meta (
     key   TEXT PRIMARY KEY,
@@ -187,3 +248,12 @@ def set_meta(conn: sqlite3.Connection, key: str, value: str) -> None:
     with conn:
         conn.execute("INSERT INTO meta (key, value) VALUES (?, ?) "
                      "ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value))
+
+
+def listing_from_row(row: sqlite3.Row) -> Listing:
+    return Listing(
+        id=row["id"], name=row["name"], disposition=row["disposition"], area_m2=row["area_m2"],
+        price_czk=row["price_czk"], price_m2=row["price_m2"], region_id=row["region_id"],
+        district=row["district"], quarter=row["quarter"], citypart=row["citypart"],
+        city=row["city"], street=row["street"], lat=row["lat"], lon=row["lon"],
+        premise_id=row["premise_id"], user_id=row["user_id"])

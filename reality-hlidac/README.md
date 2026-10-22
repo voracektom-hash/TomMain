@@ -1,10 +1,11 @@
 # Reality Hlídač
 
 Hlídá nové inzeráty bytů na prodej na Sreality.cz (Praha + Středočeský kraj) a do ~60 s
-od zveřejnění pošle SMS, když byt splní tvoje kritéria.
+od zveřejnění pošle push notifikaci (a později SMS), když byt splní tvoje kritéria.
 
-**Stav:** Fáze 1 (watcher) je hotová. SMS a pravidla přijdou ve Fázi 2, webová appka
-ve Fázi 3 a nasazení na VPS ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
+**Stav:** Fáze 1 (watcher) a 2 (pravidla + push notifikace přes ntfy) jsou hotové.
+Skutečné SMS (SMSbrána.cz) se doplní později, zatím se SMS jen vypisují do logu.
+Webová appka přijde ve Fázi 3 a nasazení na VPS ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
 popis Sreality API v [`docs/API.md`](docs/API.md).
 
 ## Co dělá teď
@@ -54,4 +55,32 @@ oddálí upozornění.
 
 ## Jak přidat pravidlo
 
-Pravidla přijdou ve Fázi 2 a jejich úprava ve webové appce ve Fázi 3.
+Dokud není hotová webová appka (Fáze 3), pravidla se píšou do souboru:
+
+```bash
+cp pravidla.example.toml pravidla.toml   # vzor s vysvětlivkami u každé položky
+# uprav pravidla.toml v libovolném textovém editoru
+make import-rules                        # nahraje pravidla (stejný název = přepíše)
+make rules                               # vypíše pravidla
+make preview                             # kolik bytů by které pravidlo chytilo
+```
+
+Lokalita může být obvod („Praha 5“), městská část („Praha-Libuš“), část („Smíchov“)
+nebo obec („Černošice“). Když název neexistuje, příkaz napoví podobné.
+Změna platí od příští kontroly, watcher není potřeba restartovat.
+
+## Notifikace
+
+1. Nainstaluj si do telefonu aplikaci **ntfy** (zdarma).
+2. Vymysli tajný název kanálu, třeba `python3 -c "import secrets; print('hlidac-' + secrets.token_urlsafe(12))"`.
+3. V aplikaci se ke kanálu přihlas (Subscribe to topic). Stejně to může udělat i další člověk v rodině.
+4. Do `.env` dej `NOTIFY_CHANNELS=ntfy` a `NTFY_TOPICS=<název kanálu>`.
+5. `make test-notify` pošle testovací notifikaci.
+
+Notifikace obsahuje fotku, cenu, Kč/m², srovnání s mediánem, podlaží, vlastnictví,
+makléře a tlačítka „Inzerát“ a „Zavolat“. SMS text (bez diakritiky, max. 2 SMS) se
+tvoří už teď a ukáže se v logu, odesílat se začne po napojení SMS brány.
+
+**Watchdog:** když 10 minut (v noci déle) neproběhne úspěšná kontrola, nebo Sreality
+začne vracet nečekaná data, přijde servisní notifikace (max. 1× za hodinu) a po
+opravě zpráva „Hlídač zase funguje“.

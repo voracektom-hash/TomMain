@@ -20,15 +20,17 @@ PRAHA_REGION_ID = 10
 def compute(conn: sqlite3.Connection, now: datetime) -> int:
     """Recompute the medians table. Returns the number of rows written."""
     rows = conn.execute(
-        """SELECT region_id, quarter, citypart, city, disposition, price_m2 FROM listings
+        """SELECT region_id, quarter, citypart, city, district, disposition, price_m2 FROM listings
            WHERE last_seen >= ? AND price_m2 >= ?""",
         (ts(now - timedelta(days=WINDOW_DAYS)), MIN_PRICE_M2)).fetchall()
 
     groups: dict[tuple[str, str], list[tuple[str | None, int]]] = defaultdict(list)
     for r in rows:
-        keys = [("city", r["city"])]
+        keys = [("city", r["city"]), ("citypart", r["citypart"])]
         if r["region_id"] == PRAHA_REGION_ID:
-            keys += [("quarter", r["quarter"]), ("citypart", r["citypart"])]
+            keys.append(("quarter", r["quarter"]))
+        else:  # okres – fallback for small villages
+            keys.append(("district", r["district"]))
         for scope, location in keys:
             if location:
                 groups[(scope, location)].append((r["disposition"], r["price_m2"]))
@@ -53,3 +55,20 @@ def compute(conn: sqlite3.Connection, now: datetime) -> int:
             "INSERT INTO medians (scope, location, disposition, median_m2, n, computed_at)"
             " VALUES (?,?,?,?,?,?)", [(*row, ts(now)) for row in out])
     return len(out)
+
+
+def lookup(conn: sqlite3.Connection, candidates: list[tuple[str, str | None]],
+           disposition: str | None) -> tuple[int, str] | None:
+    """Find the most specific median: first candidate location wins; within it, a
+    disposition-level median beats the all-dispositions one. Returns (median, label)."""
+    for scope, location in candidates:
+        if not location:
+            continue
+        rows = {r["disposition"]: r["median_m2"] for r in conn.execute(
+            "SELECT disposition, median_m2 FROM medians WHERE scope = ? AND location = ?",
+            (scope, location))}
+        if disposition and disposition in rows:
+            return rows[disposition], f"{location} {disposition}"
+        if "" in rows:
+            return rows[""], location
+    return None

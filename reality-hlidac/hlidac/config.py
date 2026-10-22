@@ -20,6 +20,12 @@ class Config:
     page_limit: int
     user_agent: str
     log_level: str
+    notify_channels: tuple[str, ...] = ("console",)
+    ntfy_server: str = "https://ntfy.sh"
+    ntfy_topics: tuple[str, ...] = ()
+    ntfy_token: str | None = None
+    sms_provider: str = "console"
+    sms_recipients: tuple[str, ...] = ()
 
 
 def load_env_file(path: Path) -> None:
@@ -43,7 +49,17 @@ def load(env_file: str | Path = ".env") -> Config:
         page_limit=int(env.get("PAGE_LIMIT", "60")),
         user_agent=env.get("USER_AGENT", DEFAULT_USER_AGENT),
         log_level=env.get("LOG_LEVEL", "INFO").upper(),
+        notify_channels=_list(env.get("NOTIFY_CHANNELS", "console")),
+        ntfy_server=env.get("NTFY_SERVER", "https://ntfy.sh"),
+        ntfy_topics=_list(env.get("NTFY_TOPICS", "")),
+        ntfy_token=env.get("NTFY_TOKEN") or None,
+        sms_provider=env.get("SMS_PROVIDER", "console"),
+        sms_recipients=_list(env.get("SMS_RECIPIENTS", "")),
     )
+
+
+def _list(value: str) -> tuple[str, ...]:
+    return tuple(x.strip() for x in value.split(",") if x.strip())
 
 
 class PragueFormatter(logging.Formatter):

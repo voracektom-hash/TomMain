@@ -32,6 +32,7 @@ GET /api/v1/estates/search
 - Víc hodnot v jednom parametru: **čárka** (`10,11`). Svislítko (`10|11`) vrací `422 Invalid arguments`.
   Opakovaný parametr (`...=10&...=11`) tiše vezme jen první hodnotu.
 - Odpověď: `{pagination: {limit, offset, total}, results: [...], status_code, status_message, ...}`.
+- Filtr podlaží: `floor_number_from` / `floor_number_to` (hodnota 0 se ignoruje).
 - Řazení (z JS bundlu webu): `-date`, `price_asc`, `price_desc`, `price_m2_asc`, `price_m2_desc`.
   `-price_change_time` existuje v kódu, ale API ho ignoruje (vrací stejné pořadí jako `-date`).
 - Velikost: 60 inzerátů ≈ 296 kB, s `Accept-Encoding: gzip` ≈ 35 kB.
@@ -100,7 +101,7 @@ Důležitá pole:
 | `edited` | `"2026-10-21"` | poslední úprava |
 | `usable_area` | `91` | užitná plocha m² |
 | `floor_area` | `103` | podlahová plocha |
-| `floor_number` | `2` | patro (2 = 2. NP; ověříme na přízemí v datech) |
+| `floor_number` | `2` | podlaží nad zemí: **1 = 1. NP = přízemí**, 2 = 2. NP, -1 = suterén (ověřeno na popisech inzerátů 22. 10. 2026) |
 | `floors` | `7` | počet podlaží domu |
 | `ownership` | `{"name": "Osobní", "value": 1}` | vlastnictví (družstevní = jiná hodnota) |
 | `advert_description` | text | klíčová slova (podíl, dražba…) |
@@ -161,7 +162,8 @@ z vlastní DB (lokality, které jsme už viděli) a ze statického seznamu, bez 
 - Nejkratší funkční tvar: `sreality.cz/detail/prodej/byt/2+kk/x/1725177932` (~46 znaků).
 - `/detail/{id}` vrací 404.
 
-Pro SMS (limit 160 znaků) je to hodně. Řešení navrhnu ve Fázi 2 (vlastní zkracovač vs. služba).
+Funguje i bez `www`: `https://sreality.cz/detail/prodej/byt/2+kk/x/{id}` (52 znaků, 301 na správnou URL).
+Celá SMS se tak vejde do 2 segmentů (≤ 306 znaků), zkracovač není potřeba.
 
 ## 5. Hlavičky, cookies, limity
 
