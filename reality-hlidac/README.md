@@ -3,9 +3,9 @@
 Hlídá nové inzeráty bytů na prodej na Sreality.cz (Praha + Středočeský kraj) a do ~60 s
 od zveřejnění pošle push notifikaci (a později SMS), když byt splní tvoje kritéria.
 
-**Stav:** Fáze 1 (watcher) a 2 (pravidla + push notifikace přes ntfy) jsou hotové.
-Skutečné SMS (SMSbrána.cz) se doplní později, zatím se SMS jen vypisují do logu.
-Webová appka přijde ve Fázi 3 a nasazení na VPS ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
+**Stav:** Fáze 1 (watcher), 2 (pravidla + push notifikace přes ntfy) a 3 (webová appka)
+jsou hotové. Skutečné SMS (SMSbrána.cz) se doplní později, zatím se SMS jen vypisují do
+logu. Nasazení na VPS přijde ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
 popis Sreality API v [`docs/API.md`](docs/API.md).
 
 ## Co dělá teď
@@ -23,8 +23,10 @@ Potřebuješ Python 3.12 nebo novější a `make`. Na Macu jsou obvykle už nain
 
 ```bash
 cd reality-hlidac
-make dev      # první spuštění vytvoří .venv a .env a spustí watcher
+make dev      # první spuštění vytvoří .venv a .env, spustí watcher i webovou appku
 ```
+
+Appka běží na http://localhost:8000. Watcher a appka sdílejí jednu databázi.
 
 Při prvním spuštění watcher asi 7 minut prochází celou nabídku (~8 300 bytů), aby věděl,
 co už existuje. Teprve potom hlásí nové inzeráty. Zastavíš ho klávesami `Ctrl+C`.
@@ -53,9 +55,28 @@ přibývají aspoň 3 nové byty za hodinu, kontroluje každou minutu, při mén
 za hodinu jen každých 10 minut. Nic se tím neztratí, pomalejší kontrola jen o pár minut
 oddálí upozornění.
 
+## Webová appka
+
+Mobile-first, funguje na iPhonu i v počítači. Na iPhonu ji v Safari přidáš na plochu přes
+Sdílet → Přidat na plochu.
+
+| Obrazovka | Co tam je |
+|---|---|
+| Pravidla | seznam, přepínač aktivní, upravit / duplikovat / smazat |
+| Editor | všechna kritéria, lokalita s našeptáváním, **živý náhled** – kolik bytů za 7 dní by pravidlo chytilo |
+| Historie | každá odeslaná / čekající / zahozená zpráva, komu a proč |
+| Mediány | Kč/m² za 90 dní podle obvodu, části, obce a okresu |
+| Stav | poslední kontrola, počty dnes, chyby |
+| Nastavení | kanály, ntfy témata, SMS čísla, testovací notifikace |
+
+Appka hlídá i samotný watcher: když 25 minut neproběhne kontrola, pošle servisní notifikaci.
+
 ## Jak přidat pravidlo
 
-Dokud není hotová webová appka (Fáze 3), pravidla se píšou do souboru:
+V appce: **Pravidla → + Nové**. Náhled dole ukazuje, kolik bytů by pravidlo chytilo,
+takže kritéria vyladíš ještě před uložením.
+
+Alternativně z příkazové řádky přes soubor:
 
 ```bash
 cp pravidla.example.toml pravidla.toml   # vzor s vysvětlivkami u každé položky

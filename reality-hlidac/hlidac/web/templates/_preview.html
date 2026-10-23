@@ -1,0 +1,31 @@
+{% if error %}
+  <p class="muted">{{ error }}</p>
+{% else %}
+  <div class="stats">
+    <div><strong>{{ result.sure }}</strong><span>jistě</span></div>
+    <div><strong>{{ result.maybe }}</strong><span>možná</span></div>
+    <div><strong>{{ result.offer_hits }}</strong><span>v nabídce</span></div>
+  </div>
+  <p class="small muted">
+    Za posledních {{ result.days }} dní přibylo {{ result.new_total }} nových bytů, pravidlo by
+    chytilo {{ result.sure }} jistě a {{ result.maybe }} možná.
+    {% if result.maybe %}„Možná“ = splní vše kromě patra, vlastnictví nebo slov v popisu, které
+    se ověří až z detailu inzerátu.{% endif %}
+    {% if result.rejected_by_detail %}{{ result.rejected_by_detail }} dalších by odpadlo po detailu.{% endif %}
+    Z aktuální nabídky ({{ result.offer_total | thousands }} bytů) odpovídá {{ result.offer_hits }}.
+  </p>
+  {% if result.new_total < 50 %}<p class="small warn">Hlídač běží krátce, za 7 dní bude náhled přesnější. Zatím se řiď číslem „v nabídce“.</p>{% endif %}
+  {% if shown %}
+  <ul class="hits">
+    {% for h in shown %}
+    <li>
+      <a href="{{ h.listing.url }}" target="_blank" rel="noopener">
+        <span>{{ h.listing.disposition }} {{ '%g' % h.listing.area_m2 if h.listing.area_m2 }} m² · {{ h.listing.citypart or h.listing.city }}</span>
+        <span class="price">{{ h.listing.price_czk | money }}{% if not h.sure %} <em>možná</em>{% endif %}</span>
+      </a>
+      <small class="muted">{{ h.first_seen | local }}{% if h.listing.price_m2 %} · {{ h.listing.price_m2 | thousands }} Kč/m²{% endif %}</small>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endif %}

@@ -2,7 +2,7 @@ PY ?= python3
 VENV = .venv
 BIN = $(VENV)/bin
 
-.PHONY: install dev stats test clean import-rules rules preview test-notify
+.PHONY: install dev watcher web stats test clean import-rules rules preview test-notify icons
 
 $(BIN)/python:
 	$(PY) -m venv $(VENV)
@@ -10,9 +10,18 @@ $(BIN)/python:
 
 install: $(BIN)/python  ## Create .venv and install dependencies
 
-dev: install  ## Run the watcher locally (Ctrl+C to stop)
+dev: install  ## Run watcher + web app locally (Ctrl+C to stop)
+	./scripts/dev.sh
+
+watcher: install  ## Run only the watcher
 	@test -f .env || cp .env.example .env
 	$(BIN)/python -m hlidac.watcher
+
+web: install  ## Run only the web app (http://localhost:8000)
+	$(BIN)/python -m hlidac.web.app
+
+icons:  ## Regenerate app icons
+	python3 scripts/make_icons.py
 
 stats: install  ## Show collected data and medians
 	$(BIN)/python -m hlidac.stats

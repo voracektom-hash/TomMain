@@ -95,15 +95,9 @@ class AlertEngine:
 
     def detail(self, listing_id: int) -> ListingDetail | None:
         """Detail from cache or Sreality. None if unavailable (rule check then decides)."""
-        row = self.conn.execute("SELECT * FROM listing_details WHERE listing_id = ?",
-                                (listing_id,)).fetchone()
-        if row and db.utcnow() - db.parse_ts(row["fetched_at"]) < DETAIL_CACHE:
-            return ListingDetail(
-                id=listing_id, since=row["since"], edited=None, floor=row["floor"],
-                floors_total=row["floors_total"], ownership=row["ownership"],
-                usable_area=row["usable_area"], description=row["description"] or "",
-                broker_name=row["broker_name"], broker_phone=row["broker_phone"],
-                broker_email=row["broker_email"], agency=row["agency"])
+        cached = cached_detail(self.conn, listing_id, max_age=DETAIL_CACHE)
+        if cached:
+            return cached
         try:
             data = self.client.detail(listing_id)
             if data is None:
@@ -215,8 +209,11 @@ class AlertEngine:
         At most one alarm per hour, plus one "all good again" message after recovery."""
         last_ok = self.conn.execute(
             "SELECT MAX(started_at) FROM runs WHERE kind = 'poll' AND ok = 1").fetchone()[0]
+        since = db.parse_ts(last_ok) if last_ok else None
+        limit = max(WATCHDOG_MIN_SILENCE, timedelta(seconds=2.5 * expected_interval_s))
+        healthy = since is not None and now - since <= limit
         alarm_on = db.get_meta(self.conn, "watchdog_alarm") == "1"
-        if error is None and last_ok and alarm_on:
+        if healthy and error is None and alarm_on:
             db.set_meta(self.conn, "watchdog_alarm", "0")
             self._service("Hlídač zase funguje, kontroly probíhají normálně.", now)
             return
@@ -224,15 +221,12 @@ class AlertEngine:
         problem = None
         if isinstance(error, ParseError):
             problem = f"Sreality vrací nečekaná data (možná změna API): {error}"
-        else:
-            limit = max(WATCHDOG_MIN_SILENCE, timedelta(seconds=2.5 * expected_interval_s))
-            since = db.parse_ts(last_ok) if last_ok else None
-            if since is None or now - since > limit:
-                minutes = int((now - since).total_seconds() // 60) if since else None
-                ago = f"{minutes} min" if minutes is not None else "nikdy"
-                problem = f"Žádná úspěšná kontrola Sreality ({ago})."
-                if error:
-                    problem += f" Poslední chyba: {error}"
+        elif not healthy:
+            minutes = int((now - since).total_seconds() // 60) if since else None
+            ago = f"{minutes} min" if minutes is not None else "nikdy"
+            problem = f"Žádná úspěšná kontrola Sreality ({ago})."
+            if error:
+                problem += f" Poslední chyba: {error}"
         if problem is None:
             return
         last_sent = db.get_meta(self.conn, "watchdog_sent_at")
@@ -260,3 +254,19 @@ def quiet_decision(rules: list[Rule], now: datetime) -> tuple[str, datetime]:
     if not deferring:
         return "dropped", now
     return "queued", min(r.quiet_ends_at(now) for r in deferring)
+
+
+def cached_detail(conn: sqlite3.Connection, listing_id: int,
+                  max_age: timedelta | None = None) -> ListingDetail | None:
+    row = conn.execute("SELECT * FROM listing_details WHERE listing_id = ?",
+                       (listing_id,)).fetchone()
+    if row is None:
+        return None
+    if max_age is not None and db.utcnow() - db.parse_ts(row["fetched_at"]) >= max_age:
+        return None
+    return ListingDetail(
+        id=listing_id, since=row["since"], edited=None, floor=row["floor"],
+        floors_total=row["floors_total"], ownership=row["ownership"],
+        usable_area=row["usable_area"], description=row["description"] or "",
+        broker_name=row["broker_name"], broker_phone=row["broker_phone"],
+        broker_email=row["broker_email"], agency=row["agency"])

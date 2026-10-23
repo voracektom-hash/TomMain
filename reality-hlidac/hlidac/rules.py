@@ -174,3 +174,48 @@ def save_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> int:
             + ", updated_at = excluded.updated_at",
             (*values, ts(now), ts(now)))
     return conn.execute("SELECT id FROM rules WHERE name = ?", (rule.name,)).fetchone()["id"]
+
+
+class DuplicateRuleName(ValueError):
+    pass
+
+
+def get_rule(conn: sqlite3.Connection, rule_id: int) -> Rule | None:
+    row = conn.execute("SELECT * FROM rules WHERE id = ?", (rule_id,)).fetchone()
+    return _from_row(row) if row else None
+
+
+def create_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> int:
+    if conn.execute("SELECT 1 FROM rules WHERE name = ?", (rule.name,)).fetchone():
+        raise DuplicateRuleName(rule.name)
+    return save_rule(conn, rule, now)
+
+
+def update_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> None:
+    """Update by id (the name may change)."""
+    clash = conn.execute("SELECT 1 FROM rules WHERE name = ? AND id != ?",
+                         (rule.name, rule.id)).fetchone()
+    if clash:
+        raise DuplicateRuleName(rule.name)
+    values = []
+    for k in _COLUMNS:
+        v = getattr(rule, k)
+        if k in _JSON_FIELDS:
+            v = json.dumps(v, ensure_ascii=False)
+        elif k in _BOOL_FIELDS:
+            v = int(v)
+        values.append(v)
+    with conn:
+        conn.execute(f"UPDATE rules SET {', '.join(f'{k} = ?' for k in _COLUMNS)}, "
+                     "updated_at = ? WHERE id = ?", (*values, ts(now), rule.id))
+
+
+def set_active(conn: sqlite3.Connection, rule_id: int, active: bool, now: datetime) -> None:
+    with conn:
+        conn.execute("UPDATE rules SET active = ?, updated_at = ? WHERE id = ?",
+                     (int(active), ts(now), rule_id))
+
+
+def delete_rule(conn: sqlite3.Connection, rule_id: int) -> None:
+    with conn:
+        conn.execute("DELETE FROM rules WHERE id = ?", (rule_id,))

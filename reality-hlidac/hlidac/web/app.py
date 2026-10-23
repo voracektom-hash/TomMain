@@ -1,0 +1,498 @@
+"""Configuration web app: rules, preview, alert history, status, medians, settings.
+
+Run with:  python -m hlidac.web.app      (port 8000, or WEB_PORT)
+"""
+
+from __future__ import annotations
+
+import base64
+import json
+import logging
+import os
+import re
+import secrets
+import sqlite3
+import threading
+from contextlib import asynccontextmanager
+from dataclasses import replace
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Iterator
+
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.datastructures import FormData
+
+from hlidac import config, db, locations, rules, settings
+from hlidac.alerts import AlertEngine
+from hlidac.notify.base import Message
+from hlidac.preview import preview
+from hlidac.rules import Rule
+from hlidac.rules_cli import DISPOSITIONS, OWNERSHIPS
+from hlidac.schedule import TZ
+from hlidac.sreality.client import SrealityClient
+
+log = logging.getLogger("hlidac")
+HERE = Path(__file__).parent
+WEB_WATCHDOG_EVERY_S = 300
+WEB_WATCHDOG_INTERVAL_S = 600  # watchdog fires after 2.5 × this = 25 min without a poll
+PHONE_RE = re.compile(r"^\+?\d{9,15}$")
+TOPIC_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+
+# --- formatting helpers for templates ------------------------------------------------------
+
+def money(czk: int | None) -> str:
+    if not czk:
+        return "na dotaz"
+    return f"{czk / 1_000_000:.2f} M Kč".replace(".", ",")
+
+
+def thousands(n: int | float | None) -> str:
+    return "–" if n is None else f"{round(n):,}".replace(",", " ")
+
+
+def local(value: str | None, fmt: str = "%d. %m. %H:%M") -> str:
+    if not value:
+        return "–"
+    return db.parse_ts(value).astimezone(TZ).strftime(fmt)
+
+
+def ago(value: str | None) -> str:
+    if not value:
+        return "nikdy"
+    seconds = (db.utcnow() - db.parse_ts(value)).total_seconds()
+    if seconds < 90:
+        return "před chvílí"
+    if seconds < 3600:
+        return f"před {round(seconds / 60)} min"
+    if seconds < 86400:
+        return f"před {seconds / 3600:.1f} h".replace(".", ",")
+    return f"před {round(seconds / 86400)} dny"
+
+
+templates = Jinja2Templates(directory=HERE / "templates")
+templates.env.filters.update(money=money, thousands=thousands, local=local, ago=ago,
+                             fromjson=json.loads)
+templates.env.globals.update(DISPOSITIONS=DISPOSITIONS, OWNERSHIPS=OWNERSHIPS,
+                             TYPE_LABELS=locations.TYPE_LABELS)
+
+
+# --- app factory ---------------------------------------------------------------------------
+
+def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True) -> FastAPI:
+    cfg = cfg or config.load()
+
+    def get_conn() -> Iterator[sqlite3.Connection]:
+        conn = db.connect(cfg.db_path)
+        try:
+            yield conn
+        finally:
+            conn.close()
+
+    def engine(conn: sqlite3.Connection) -> AlertEngine:
+        from hlidac.watcher import build_channels
+        return AlertEngine(conn, SrealityClient(cfg.user_agent),
+                           build_channels(cfg, settings.load(conn, cfg)))
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        stop = threading.Event()
+        if start_watchdog:
+            threading.Thread(target=_watchdog_loop, args=(cfg, engine, stop), daemon=True).start()
+        yield
+        stop.set()
+
+    app = FastAPI(title="Reality Hlídač", lifespan=lifespan, docs_url=None, redoc_url=None)
+    app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
+    password = config_password()
+
+    @app.middleware("http")
+    async def basic_auth(request: Request, call_next):
+        # Optional – only when WEB_PASSWORD is set (the Caddy/public variant).
+        if password and request.url.path not in ("/healthz",):
+            header = request.headers.get("authorization", "")
+            ok = False
+            if header.startswith("Basic "):
+                try:
+                    _, _, given = base64.b64decode(header[6:]).decode().partition(":")
+                    ok = secrets.compare_digest(given, password)
+                except ValueError:
+                    ok = False
+            if not ok:
+                return Response(status_code=401,
+                                headers={"WWW-Authenticate": 'Basic realm="Reality Hlidac"'})
+        return await call_next(request)
+
+    def render(request: Request, name: str, status_code: int = 200, **ctx) -> HTMLResponse:
+        return templates.TemplateResponse(request, name, ctx, status_code=status_code)
+
+    # --- rules -----------------------------------------------------------------------------
+
+    @app.get("/", response_class=HTMLResponse)
+    def rules_page(request: Request, conn=Depends(get_conn)):
+        all_rules = rules.load_rules(conn, active_only=False)
+        last_alert = {r["rule_names"]: r["created_at"] for r in conn.execute(
+            "SELECT rule_names, MAX(created_at) AS created_at FROM alerts "
+            "WHERE kind != 'service' GROUP BY rule_names")}
+        return render(request, "rules.html", page="rules", rules=all_rules,
+                      describe=describe_rule, last_alert=last_alert)
+
+    @app.post("/rules/{rule_id}/toggle", response_class=HTMLResponse)
+    def toggle(request: Request, rule_id: int, conn=Depends(get_conn)):
+        rule = rules.get_rule(conn, rule_id)
+        if rule is None:
+            return Response(status_code=404)
+        rules.set_active(conn, rule_id, not rule.active, db.utcnow())
+        return render(request, "_rule_card.html", rule=rules.get_rule(conn, rule_id),
+                      describe=describe_rule, last_alert={})
+
+    @app.get("/rules/new", response_class=HTMLResponse)
+    def new_rule(request: Request):
+        rule = Rule(name="", location_type="", location="")
+        return render(request, "rule_form.html", page="rules", rule=rule, errors={},
+                      is_new=True)
+
+    @app.get("/rules/{rule_id}", response_class=HTMLResponse)
+    def edit_rule(request: Request, rule_id: int, conn=Depends(get_conn)):
+        rule = rules.get_rule(conn, rule_id)
+        if rule is None:
+            return RedirectResponse("/", status_code=303)
+        return render(request, "rule_form.html", page="rules", rule=rule, errors={},
+                      is_new=False)
+
+    @app.get("/rules/{rule_id}/duplicate", response_class=HTMLResponse)
+    def duplicate_rule(request: Request, rule_id: int, conn=Depends(get_conn)):
+        rule = rules.get_rule(conn, rule_id)
+        if rule is None:
+            return RedirectResponse("/", status_code=303)
+        copy = replace(rule, id=None, name=f"{rule.name} (kopie)")
+        return render(request, "rule_form.html", page="rules", rule=copy, errors={},
+                      is_new=True)
+
+    @app.post("/rules/save")
+    async def save_rule(request: Request, conn=Depends(get_conn)):
+        form = await request.form()
+        rule, errors = rule_from_form(conn, form)
+        if not errors:
+            try:
+                if rule.id:
+                    rules.update_rule(conn, rule, db.utcnow())
+                else:
+                    rules.create_rule(conn, rule, db.utcnow())
+            except rules.DuplicateRuleName:
+                errors["name"] = "Pravidlo s tímto názvem už existuje."
+        if errors:
+            return render(request, "rule_form.html", 422, page="rules", rule=rule,
+                          errors=errors, is_new=not rule.id)
+        return RedirectResponse("/", status_code=303)
+
+    @app.post("/rules/{rule_id}/delete")
+    def remove_rule(rule_id: int, conn=Depends(get_conn)):
+        rules.delete_rule(conn, rule_id)
+        return RedirectResponse("/", status_code=303)
+
+    @app.post("/rules/preview", response_class=HTMLResponse)
+    async def rule_preview(request: Request, conn=Depends(get_conn)):
+        form = await request.form()
+        rule, errors = rule_from_form(conn, form, require_name=False)
+        if "location" in errors:
+            return render(request, "_preview.html", result=None, error=errors["location"])
+        result = preview(conn, rule, db.utcnow())
+        return render(request, "_preview.html", result=result, error=None,
+                      shown=result.hits[:30])
+
+    @app.get("/locations", response_class=HTMLResponse)
+    def location_options(request: Request, q: str = "", location: str = "",
+                         conn=Depends(get_conn)):
+        # The input sends its own name ("location"); "q" is for direct use.
+        return render(request, "_locations.html", items=search_locations(conn, q or location))
+
+    # --- other pages -----------------------------------------------------------------------
+
+    @app.get("/alerts", response_class=HTMLResponse)
+    def alerts_page(request: Request, page: int = 1, conn=Depends(get_conn)):
+        per_page = 40
+        rows = conn.execute(
+            """SELECT a.*, l.price_czk AS current_price FROM alerts a
+               LEFT JOIN listings l ON l.id = a.listing_id
+               ORDER BY a.id DESC LIMIT ? OFFSET ?""",
+            (per_page + 1, (page - 1) * per_page)).fetchall()
+        return render(request, "alerts.html", page="alerts", rows=rows[:per_page],
+                      page_no=page, has_next=len(rows) > per_page)
+
+    @app.get("/status", response_class=HTMLResponse)
+    def status_page(request: Request, conn=Depends(get_conn)):
+        return render(request, "status.html", page="status", s=status_data(conn))
+
+    @app.get("/medians", response_class=HTMLResponse)
+    def medians_page(request: Request, scope: str = "quarter", q: str = "",
+                     conn=Depends(get_conn)):
+        return render(request, "medians.html", page="medians", scope=scope, q=q,
+                      rows=median_rows(conn, scope, q))
+
+    @app.get("/settings", response_class=HTMLResponse)
+    def settings_page(request: Request, conn=Depends(get_conn)):
+        return render(request, "settings.html", page="settings",
+                      s=settings.load(conn, cfg), errors={}, saved=False,
+                      sms_provider=cfg.sms_provider)
+
+    @app.post("/settings", response_class=HTMLResponse)
+    async def settings_save(request: Request, conn=Depends(get_conn)):
+        form = await request.form()
+        s, errors = settings_from_form(form)
+        if not errors:
+            settings.save(conn, s)
+        return render(request, "settings.html", 422 if errors else 200, page="settings",
+                      s=s, errors=errors, saved=not errors, sms_provider=cfg.sms_provider)
+
+    @app.post("/settings/test", response_class=HTMLResponse)
+    def settings_test(conn=Depends(get_conn)):
+        eng = engine(conn)
+        if not eng.channels:
+            return HTMLResponse('<p class="msg err">Žádný kanál není zapnutý.</p>')
+        msg = Message(title="Reality Hlídač: test",
+                      body="Testovací notifikace z appky. Když ji vidíš, funguje to. ✓",
+                      sms="Reality Hlidac: testovaci SMS z appky. Funguje to.",
+                      tags=["white_check_mark"])
+        sent = eng.send_now(msg, db.utcnow())
+        total = sum(len(c.recipients) for c in eng.channels)
+        failed = conn.execute(
+            "SELECT channel, error FROM alerts WHERE kind = 'service' AND status = 'queued' "
+            "AND error IS NOT NULL ORDER BY id DESC LIMIT ?", (total - sent,)).fetchall()
+        css = "ok" if sent == total else "err"
+        text = f"Odesláno {sent} z {total}."
+        if failed:
+            text += " Chyba: " + "; ".join(f"{r['channel']}: {r['error'][:120]}" for r in failed)
+        return HTMLResponse(f'<p class="msg {css}">{escape(text)}</p>')
+
+    # --- PWA + health ----------------------------------------------------------------------
+
+    @app.get("/sw.js")
+    def service_worker():
+        return FileResponse(HERE / "static" / "sw.js", media_type="text/javascript")
+
+    @app.get("/healthz")
+    def health(conn=Depends(get_conn)):
+        conn.execute("SELECT 1")
+        return {"ok": True}
+
+    return app
+
+
+def config_password() -> str | None:
+    return os.environ.get("WEB_PASSWORD") or None
+
+
+def escape(text: str) -> str:
+    from markupsafe import escape as _escape
+    return str(_escape(text))
+
+
+# --- form parsing --------------------------------------------------------------------------
+
+def _num(form: FormData, key: str, errors: dict, *, scale: float = 1,
+         integer: bool = True) -> float | int | None:
+    raw = (form.get(key) or "").strip().replace(" ", "").replace(",", ".")
+    if not raw:
+        return None
+    try:
+        value = float(raw) * scale
+    except ValueError:
+        errors[key] = "Zadej číslo."
+        return None
+    if value < 0:
+        errors[key] = "Nesmí být záporné."
+        return None
+    return round(value) if integer else value
+
+
+def rule_from_form(conn: sqlite3.Connection, form: FormData, *,
+                   require_name: bool = True) -> tuple[Rule, dict[str, str]]:
+    errors: dict[str, str] = {}
+    name = (form.get("name") or "").strip()
+    if require_name and not name:
+        errors["name"] = "Pravidlo potřebuje název."
+    loc_text = (form.get("location") or "").strip()
+    loc_type, loc = "", loc_text
+    if not loc_text:
+        errors["location"] = "Vyber lokalitu."
+    else:
+        try:
+            loc_type, loc = locations.resolve_name(conn, loc_text)
+        except locations.UnknownLocation as exc:
+            hint = f" Myslel jsi: {', '.join(exc.suggestions)}?" if exc.suggestions else ""
+            errors["location"] = f"Neznámá lokalita „{loc_text}“.{hint}"
+
+    keywords = [k.strip() for k in (form.get("exclude_keywords") or "").split(",") if k.strip()]
+    quiet_on = form.get("quiet_on") == "1"
+    quiet_start = _num(form, "quiet_start", errors) if quiet_on else None
+    quiet_end = _num(form, "quiet_end", errors) if quiet_on else None
+    if quiet_on and (quiet_start is None or quiet_end is None
+                     or not (0 <= quiet_start <= 23 and 0 <= quiet_end <= 23)):
+        errors["quiet"] = "Tichý režim potřebuje hodinu od a do (0–23)."
+    min_area = _num(form, "min_area", errors, integer=False)
+    max_area = _num(form, "max_area", errors, integer=False)
+    if min_area and max_area and min_area > max_area:
+        errors["max_area"] = "Plocha do musí být větší než od."
+
+    rule = Rule(
+        id=int(form["id"]) if (form.get("id") or "").isdigit() else None,
+        name=name or "náhled",
+        active=form.get("active") == "1",
+        location_type=loc_type,
+        location=loc,
+        max_price=_num(form, "max_price_m", errors, scale=1_000_000),
+        max_price_m2=_num(form, "max_price_m2_k", errors, scale=1000),
+        min_area=min_area,
+        max_area=max_area,
+        dispositions=[d for d in form.getlist("dispositions") if d in DISPOSITIONS],
+        ownerships=[o for o in form.getlist("ownerships") if o in OWNERSHIPS],
+        min_floor=_num(form, "min_floor", errors),
+        no_ground_floor=form.get("no_ground_floor") == "1",
+        min_below_median=_num(form, "min_below_median", errors, integer=False),
+        exclude_keywords=keywords,
+        quiet_start=quiet_start,
+        quiet_end=quiet_end,
+        quiet_action="drop" if form.get("quiet_action") == "drop" else "defer",
+        price_drop_alert=form.get("price_drop_alert") == "1",
+    )
+    return rule, errors
+
+
+def settings_from_form(form: FormData) -> tuple[settings.Settings, dict[str, str]]:
+    errors: dict[str, str] = {}
+    lines = lambda key: tuple(  # noqa: E731
+        x.strip() for x in re.split(r"[\n,;]+", form.get(key) or "") if x.strip())
+    topics = lines("ntfy_topics")
+    phones = tuple(p.replace(" ", "") for p in lines("sms_recipients"))
+    bad = [t for t in topics if not TOPIC_RE.match(t)]
+    if bad:
+        errors["ntfy_topics"] = f"Neplatný název kanálu: {', '.join(bad)} (jen písmena, čísla, - a _)."
+    bad = [p for p in phones if not PHONE_RE.match(p)]
+    if bad:
+        errors["sms_recipients"] = f"Neplatné číslo: {', '.join(bad)} (např. +420777123456)."
+    channels = tuple(c for c in settings.CHANNELS if form.get(f"ch_{c}") == "1")
+    return settings.Settings(channels=channels, ntfy_topics=topics, sms_recipients=phones), errors
+
+
+# --- page data -----------------------------------------------------------------------------
+
+def describe_rule(r: Rule) -> list[str]:
+    bits = []
+    if r.dispositions:
+        bits.append(", ".join(r.dispositions))
+    if r.min_area or r.max_area:
+        lo = f"{r.min_area:g}" if r.min_area else "0"
+        hi = f"{r.max_area:g}" if r.max_area else "∞"
+        bits.append(f"{lo}–{hi} m²")
+    if r.max_price:
+        bits.append(f"do {money(r.max_price)}")
+    if r.max_price_m2:
+        bits.append(f"do {thousands(r.max_price_m2)} Kč/m²")
+    if r.min_below_median:
+        bits.append(f"≥ {r.min_below_median:g} % pod mediánem")
+    if r.ownerships:
+        bits.append(", ".join(r.ownerships))
+    if r.no_ground_floor:
+        bits.append("bez přízemí")
+    if r.min_floor:
+        bits.append(f"od {r.min_floor}. NP")
+    if r.quiet_start is not None:
+        action = "ráno" if r.quiet_action == "defer" else "zahodit"
+        bits.append(f"ticho {r.quiet_start}–{r.quiet_end} h ({action})")
+    if r.price_drop_alert:
+        bits.append("+ slevy")
+    return bits
+
+
+def search_locations(conn: sqlite3.Connection, q: str, limit: int = 12) -> list[tuple[str, str, int]]:
+    from hlidac.text import normalize
+    wanted = normalize(q.strip())
+    items = locations.known_locations(conn)
+    if wanted:
+        items = [i for i in items if wanted in normalize(i[1])]
+        items.sort(key=lambda i: (not normalize(i[1]).startswith(wanted), -i[2]))
+    else:
+        items.sort(key=lambda i: -i[2])
+    seen, out = set(), []
+    for loc_type, name, n in items:
+        if name not in seen:
+            seen.add(name)
+            out.append((loc_type, name, n))
+    return out[:limit]
+
+
+def status_data(conn: sqlite3.Connection) -> dict:
+    q = lambda sql, *a: conn.execute(sql, a).fetchone()[0]  # noqa: E731
+    midnight = datetime.now(TZ).replace(hour=0, minute=0, second=0, microsecond=0)
+    day_ago = db.ts(db.utcnow() - timedelta(hours=24))
+    today = db.ts(midnight)
+    last_ok = q("SELECT MAX(started_at) FROM runs WHERE kind = 'poll' AND ok = 1")
+    healthy = bool(last_ok) and db.utcnow() - db.parse_ts(last_ok) < timedelta(minutes=25)
+    return dict(
+        last_ok=last_ok,
+        healthy=healthy,
+        polls_today=q("SELECT COUNT(*) FROM runs WHERE kind = 'poll' AND ok = 1 AND started_at >= ?", today),
+        new_today=q("SELECT COUNT(*) FROM listings WHERE from_sweep = 0 AND first_seen >= ?", today),
+        drops_today=q("SELECT COUNT(*) FROM price_history WHERE changed_at >= ? AND new_price < old_price", today),
+        alerts_today=q("SELECT COUNT(*) FROM alerts WHERE status = 'sent' AND kind != 'service' AND created_at >= ?", today),
+        alerts_failed=q("SELECT COUNT(*) FROM alerts WHERE status = 'failed' AND created_at >= ?", day_ago),
+        alerts_waiting=q("SELECT COUNT(*) FROM alerts WHERE status = 'queued'"),
+        errors=conn.execute("SELECT started_at, error FROM runs WHERE ok = 0 AND started_at >= ? "
+                            "ORDER BY id DESC LIMIT 10", (day_ago,)).fetchall(),
+        listings=q("SELECT COUNT(*) FROM listings WHERE removed_at IS NULL"),
+        rules_active=q("SELECT COUNT(*) FROM rules WHERE active = 1"),
+        watchdog_alarm=db.get_meta(conn, "watchdog_alarm") == "1",
+        sweep_done=db.get_meta(conn, "sweep_done"),
+    )
+
+
+def median_rows(conn: sqlite3.Connection, scope: str, q: str) -> list[sqlite3.Row]:
+    from hlidac.text import normalize
+    if scope not in ("quarter", "citypart", "city", "district"):
+        scope = "quarter"
+    rows = conn.execute(
+        """SELECT m.location, m.median_m2, m.n,
+                  (SELECT json_group_object(d.disposition, d.median_m2) FROM medians d
+                   WHERE d.scope = m.scope AND d.location = m.location AND d.disposition != '')
+                  AS by_disp
+           FROM medians m WHERE m.scope = ? AND m.disposition = ''""", (scope,)).fetchall()
+    if q:
+        rows = [r for r in rows if normalize(q) in normalize(r["location"])]
+
+    def key(r):
+        m = re.match(r"^Praha (\d+)$", r["location"])
+        return (0, int(m.group(1)), "") if m else (1, -r["n"], r["location"])
+    return sorted(rows, key=key)
+
+
+# --- background watchdog -------------------------------------------------------------------
+
+def _watchdog_loop(cfg: config.Config, engine_factory, stop: threading.Event) -> None:
+    """Second line of defence: if the watcher process dies, the web app notices."""
+    while not stop.wait(WEB_WATCHDOG_EVERY_S):
+        try:
+            conn = db.connect(cfg.db_path)
+            try:
+                engine_factory(conn).watchdog(db.utcnow(), None, WEB_WATCHDOG_INTERVAL_S)
+            finally:
+                conn.close()
+        except Exception:  # never let the thread die
+            log.exception("Watchdog v appce selhal")
+
+
+def main() -> None:
+    import uvicorn
+    cfg = config.load()
+    config.setup_logging(cfg.log_level)
+    port = int(os.environ.get("WEB_PORT", "8000"))
+    log.info("Appka běží na http://0.0.0.0:%d", port)
+    uvicorn.run("hlidac.web.app:create_app", factory=True, host="0.0.0.0", port=port,
+                log_level="warning")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,23 @@
+<article class="card rule {{ '' if rule.active else 'off' }}" id="rule-{{ rule.id }}">
+  <div class="rule-head">
+    <a href="/rules/{{ rule.id }}" class="rule-name">
+      <strong>{{ rule.name }}</strong>
+      <small>{{ rule.location }} · {{ TYPE_LABELS.get(rule.location_type, '') }}</small>
+    </a>
+    <button class="switch {{ 'on' if rule.active }}" aria-label="Aktivní"
+            hx-post="/rules/{{ rule.id }}/toggle" hx-target="#rule-{{ rule.id }}" hx-swap="outerHTML">
+      <span></span>
+    </button>
+  </div>
+  {% set bits = describe(rule) %}
+  {% if bits %}<p class="chips">{% for b in bits %}<span>{{ b }}</span>{% endfor %}</p>{% endif %}
+  {% if last_alert.get(rule.name) %}<p class="muted small">Poslední shoda {{ last_alert[rule.name] | ago }}</p>{% endif %}
+  <div class="actions">
+    <a class="btn" href="/rules/{{ rule.id }}">Upravit</a>
+    <a class="btn" href="/rules/{{ rule.id }}/duplicate">Duplikovat</a>
+    <form method="post" action="/rules/{{ rule.id }}/delete"
+          onsubmit='return confirm({{ ("Smazat pravidlo „" ~ rule.name ~ "“?") | tojson }})'>
+      <button class="btn danger">Smazat</button>
+    </form>
+  </div>
+</article>

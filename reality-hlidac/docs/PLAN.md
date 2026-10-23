@@ -7,7 +7,7 @@
 | 0 — Zjištění API | `docs/API.md`, uložené ukázkové odpovědi v `tests/fixtures/` | ✅ hotovo |
 | 1 — Watcher | adaptivní poller (60 s ±10 s přes den), SQLite, historie cen, mediány 90 dní | ✅ hotovo |
 | 2 — Pravidla + notifikace | filtr pravidel, ntfy push + SMS (console; SMSbrána později), tichý režim, watchdog | ✅ hotovo (bez SMSbrány) |
-| 3 — Appka | FastAPI + Jinja2 + HTMX, PWA, 6 obrazovek + mediány | čeká |
+| 3 — Appka | FastAPI + Jinja2 + HTMX, PWA, 6 obrazovek + mediány, druhý watchdog | ✅ hotovo |
 | 4 — Nasazení | Docker Compose, Tailscale, zálohy, `docs/NASAZENI.md` | čeká |
 
 ## Architektura
@@ -58,12 +58,16 @@ reality-hlidac/
 │   │   ├── console.py        # výpis do logu (i jako SMS náhrada)
 │   │   └── format.py         # texty: push s diakritikou, SMS ASCII ≤ 2 segmenty
 │   ├── watcher.py            # hlavní smyčka + watchdog
+│   ├── preview.py            # „kolik bytů by pravidlo chytilo“
+│   ├── settings.py           # nastavení v DB (výchozí hodnoty z .env)
 │   └── web/
-│       ├── app.py            # FastAPI routy
+│       ├── app.py            # FastAPI routy, formuláře, watchdog vlákno
 │       ├── templates/        # Jinja2 + HTMX
 │       └── static/           # CSS, manifest.json, ikony, service worker
 ├── scripts/
-│   └── backup.sh             # denní záloha, 7 dní retence
+│   ├── dev.sh                # lokálně watcher + appka
+│   ├── make_icons.py         # ikony PWA
+│   └── backup.sh             # denní záloha, 7 dní retence (Fáze 4)
 └── tests/
     ├── fixtures/             # uložené JSON odpovědi Sreality
     ├── test_parser.py

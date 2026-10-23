@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Mediány · Reality Hlídač{% endblock %}
+{% set SCOPES = [("quarter", "Praha obvody"), ("citypart", "Části"), ("city", "Obce"), ("district", "Okresy")] %}
+{% set COLS = ["1+kk", "2+kk", "3+kk", "4+kk"] %}
+{% block content %}
+<h1>Mediány Kč/m²</h1>
+<p class="small muted">Nabídkové ceny za posledních 90 dní. Dispozice se ukazuje, jen když je k dispozici aspoň 10 bytů.</p>
+<nav class="seg">
+  {% for key, label in SCOPES %}<a href="/medians?scope={{ key }}" class="{{ 'on' if scope == key }}">{{ label }}</a>{% endfor %}
+</nav>
+<form class="search" method="get" action="/medians">
+  <input type="hidden" name="scope" value="{{ scope }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="Hledat lokalitu…">
+</form>
+<div class="table-wrap">
+<table class="medians">
+  <thead><tr><th>Lokalita</th><th>Vše</th>{% for c in COLS %}<th>{{ c }}</th>{% endfor %}<th>n</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    {% set d = (r.by_disp | fromjson) if r.by_disp else {} %}
+    <tr>
+      <td>{{ r.location }}</td>
+      <td><strong>{{ (r.median_m2 / 1000) | round | int }}k</strong></td>
+      {% for c in COLS %}<td>{% if d.get(c) %}{{ (d[c] / 1000) | round | int }}k{% else %}<span class="muted">–</span>{% endif %}</td>{% endfor %}
+      <td class="muted">{{ r.n }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">Žádná data.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

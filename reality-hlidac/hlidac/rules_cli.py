@@ -10,14 +10,12 @@ from __future__ import annotations
 
 import sys
 import tomllib
-from datetime import timedelta
-
 from hlidac import config, db, locations
 from hlidac.alerts import AlertEngine
 from hlidac.notify.base import Message
-from hlidac.rules import Rule, check_listing, load_rules, save_rule
+from hlidac.preview import preview
+from hlidac.rules import Rule, load_rules, save_rule
 from hlidac.sreality.client import SrealityClient
-from hlidac.text import find_keyword
 
 PREVIEW_DAYS = 7
 PREVIEW_SHOW = 15
@@ -141,33 +139,23 @@ def cmd_list(conn) -> None:
 
 
 def cmd_preview(conn) -> None:
-    """Search-data criteria only; floor/ownership need a detail and are not checked here."""
-    since = db.ts(db.utcnow() - timedelta(days=PREVIEW_DAYS))
-    new_rows = conn.execute("SELECT * FROM listings WHERE from_sweep = 0 AND first_seen >= ? "
-                            "ORDER BY first_seen DESC", (since,)).fetchall()
-    active_rows = conn.execute("SELECT * FROM listings WHERE removed_at IS NULL").fetchall()
-    print(f"Nových inzerátů za {PREVIEW_DAYS} dní: {len(new_rows)}, "
-          f"aktuální nabídka: {len(active_rows)}\n")
+    now = db.utcnow()
     for rule in load_rules(conn, active_only=False):
-        hits_new = [r for r in new_rows if _preview_match(conn, rule, r)]
-        hits_all = sum(1 for r in active_rows if _preview_match(conn, rule, r))
-        print(f"■ {rule.name}: {len(hits_new)} nových za {PREVIEW_DAYS} dní, "
-              f"{hits_all} v aktuální nabídce")
-        for r in hits_new[:PREVIEW_SHOW]:
-            l = db.listing_from_row(r)
+        p = preview(conn, rule, now, PREVIEW_DAYS)
+        print(f"■ {rule.name}: {p.sure} jistě + {p.maybe} možná z {p.new_total} nových "
+              f"za {p.days} dní · {p.offer_hits} z {p.offer_total} v aktuální nabídce")
+        for h in p.hits[:PREVIEW_SHOW]:
+            l = h.listing
             price = f"{l.price_czk / 1e6:.2f} M".replace(".", ",") if l.price_czk else "na dotaz"
-            print(f"    {r['first_seen'][:16]}  {l.disposition} {l.area_m2:g} m²  {price}  {l.url}")
-    print("\nPozn.: patro, vlastnictví a slova v popisu se kontrolují až z detailu inzerátu.")
-
-
-def _preview_match(conn, rule: Rule, row) -> bool:
-    l = db.listing_from_row(row)
-    return check_listing(conn, rule, l) is None and not find_keyword(l.name, rule.exclude_keywords)
+            mark = "" if h.sure else " (možná)"
+            print(f"    {h.first_seen[:16]}  {l.disposition} {l.area_m2:g} m²  {price}{mark}  {l.url}")
+    print("\n„Možná“ = projde vším kromě patra/vlastnictví/slov v popisu, které známe až z detailu.")
 
 
 def cmd_test_notify(conn, cfg) -> None:
+    from hlidac import settings
     from hlidac.watcher import build_channels
-    channels = build_channels(cfg)
+    channels = build_channels(cfg, settings.load(conn, cfg))
     engine = AlertEngine(conn, SrealityClient(cfg.user_agent), channels)
     msg = Message(title="Reality Hlídač: test", body="Testovací notifikace. Když ji vidíš, funguje to. ✓",
                   sms="Reality Hlidac: testovaci SMS. Funguje to.", priority=3, tags=["white_check_mark"])

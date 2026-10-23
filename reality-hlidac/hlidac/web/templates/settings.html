@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Nastavení · Reality Hlídač{% endblock %}
+{% macro err(key) %}{% if errors.get(key) %}<p class="field-err">{{ errors[key] }}</p>{% endif %}{% endmacro %}
+{% block content %}
+<h1>Nastavení</h1>
+{% if saved %}<p class="msg ok">Uloženo. Platí od příští kontroly.</p>{% endif %}
+<form method="post" action="/settings">
+  <section class="card">
+    <h2>Kanály</h2>
+    <label class="check big"><input type="checkbox" name="ch_ntfy" value="1" {{ 'checked' if 'ntfy' in s.channels }}> Push notifikace (ntfy)</label>
+    <label class="check big"><input type="checkbox" name="ch_sms" value="1" {{ 'checked' if 'sms' in s.channels }}> SMS
+      {% if sms_provider == 'console' %}<small class="muted">(zatím jen do logu, SMS brána není napojená)</small>{% endif %}</label>
+    <label class="check"><input type="checkbox" name="ch_console" value="1" {{ 'checked' if 'console' in s.channels }}> Výpis do logu</label>
+  </section>
+
+  <section class="card">
+    <h2>ntfy kanály</h2>
+    <label class="field"><span>Jeden na řádek. Ke stejnému kanálu se může přihlásit víc telefonů.</span>
+      <textarea name="ntfy_topics" rows="2" autocapitalize="off" spellcheck="false">{{ s.ntfy_topics | join('\n') }}</textarea>
+      {{ err('ntfy_topics') }}</label>
+    <p class="small muted">Název kanálu funguje jako heslo – kdo ho zná, vidí tvoje notifikace.</p>
+  </section>
+
+  <section class="card">
+    <h2>Telefonní čísla pro SMS</h2>
+    <label class="field"><span>Jedno na řádek, např. +420777123456</span>
+      <textarea name="sms_recipients" rows="2" inputmode="tel">{{ s.sms_recipients | join('\n') }}</textarea>
+      {{ err('sms_recipients') }}</label>
+  </section>
+
+  <button class="btn primary big" type="submit">Uložit</button>
+</form>
+
+<section class="card">
+  <h2>Test</h2>
+  <p class="small muted">Pošle testovací zprávu do všech zapnutých kanálů (podle uloženého nastavení).</p>
+  <button class="btn big" hx-post="/settings/test" hx-target="#test-result" hx-disabled-elt="this">Poslat testovací notifikaci</button>
+  <div id="test-result"></div>
+</section>
+<p class="small muted">Tichý režim se nastavuje u každého pravidla zvlášť.</p>
+{% endblock %}

@@ -1,0 +1,16 @@
+{
+  "name": "Reality Hlídač",
+  "short_name": "Hlídač",
+  "description": "Hlídání nových bytů na Sreality.cz",
+  "lang": "cs",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1f5fbf",
+  "icons": [
+    {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

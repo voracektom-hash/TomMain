@@ -195,3 +195,12 @@ def test_watchdog_tolerates_slow_night_interval(conn, setup):
     db.record_run(conn, "poll", NOON - timedelta(minutes=12), NOON, True)
     engine.watchdog(NOON, None, 600)  # 10-min interval at night: 12 min gap is fine
     assert ntfy.sent == []
+
+
+def test_watchdog_no_false_recovery_while_still_dead(conn, setup):
+    engine, ntfy, _, _ = setup
+    db.record_run(conn, "poll", NOON - timedelta(minutes=40), NOON, True)
+    engine.watchdog(NOON, None, 600)            # web app check: 40 min > 25 min → alarm
+    engine.watchdog(NOON + timedelta(minutes=5), None, 600)
+    assert len(ntfy.sent) == 1
+    assert "zase funguje" not in ntfy.sent[0][1].body

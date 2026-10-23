@@ -3,14 +3,22 @@ name = "reality-hlidac"
 version = "0.1.0"
 description = "Watches new flat listings on Sreality.cz and sends SMS alerts."
 requires-python = ">=3.12"
-# The watcher uses only the standard library; web app deps arrive in phase 3.
-dependencies = []
+# The watcher uses only the standard library; these are for the web app.
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn==0.34.0",
+    "jinja2==3.1.5",
+    "python-multipart==0.0.20",
+]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "httpx==0.28.1"]
 
 [tool.setuptools]
-packages = ["hlidac", "hlidac.sreality"]
+packages = ["hlidac", "hlidac.sreality", "hlidac.notify", "hlidac.web"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+"hlidac.web" = ["templates/*.html", "static/*"]
