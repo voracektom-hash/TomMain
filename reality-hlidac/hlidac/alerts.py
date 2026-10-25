@@ -3,7 +3,7 @@
 Flow per poll:
   1. match new listings and price drops against active rules (search data first)
   2. download the detail only for candidates, finish the check
-  3. queue one alert per channel+recipient (respecting quiet mode)
+  3. queue one alert per recipient of the rule's owner (respecting quiet mode)
   4. send everything that is due; failed sends are retried
 Plus the watchdog that reports when the watcher itself is in trouble.
 """
@@ -23,6 +23,7 @@ from hlidac.schedule import TZ
 from hlidac.rules import Rule, below_median, check_detail, check_listing, load_rules
 from hlidac.sreality.client import SrealityClient, SrealityError
 from hlidac.sreality.parser import Listing, ListingDetail, ParseError, parse_detail
+from hlidac.users import admins, get_user
 
 log = logging.getLogger("hlidac")
 
@@ -32,18 +33,40 @@ WATCHDOG_MIN_SILENCE = timedelta(minutes=10)
 WATCHDOG_REPEAT = timedelta(hours=1)
 
 
-@dataclass
-class Channel:
-    notifier: Notifier
-    recipients: list[str]
+@dataclass(frozen=True)
+class Recipient:
+    user_id: int | None
+    channel: str     # 'ntfy' or 'console'
+    address: str     # ntfy topic, or 'log'
+    priority: int = 3
 
 
 class AlertEngine:
+    """notifiers: channel name -> Notifier. Who gets what comes from the users table:
+    a rule's alerts go to its owner, service messages to the admins."""
+
     def __init__(self, conn: sqlite3.Connection, client: SrealityClient,
-                 channels: list[Channel]):
+                 notifiers: dict[str, Notifier]):
         self.conn = conn
         self.client = client
-        self.channels = channels
+        self.notifiers = notifiers
+
+    def recipients(self, user_id: int | None) -> list[Recipient]:
+        """Where to deliver for this user; None = the admins (service messages)."""
+        if user_id is None:
+            people = admins(self.conn)
+        else:
+            user = get_user(self.conn, user_id)
+            people = [user] if user else admins(self.conn)
+        out = []
+        for u in people:
+            if "ntfy" in self.notifiers and u.ntfy_topic:
+                out.append(Recipient(u.id, "ntfy", u.ntfy_topic, u.priority))
+            if "console" in self.notifiers:
+                out.append(Recipient(u.id, "console", f"log:{u.name}", u.priority))
+        if not out and "console" in self.notifiers:  # no accounts yet – at least log it
+            out.append(Recipient(user_id, "console", "log", 3))
+        return out
 
     # --- matching -------------------------------------------------------------------------
 
@@ -55,23 +78,21 @@ class AlertEngine:
             return 0
         queued = 0
         for l in new:
-            if self._already_alerted(l.id, "new"):
-                continue
-            matched = self._match(rules, l, drops_only=False)
-            if matched:
-                queued += self._queue(l, matched, now, drop=None)
+            for user_id, matched in self._match(rules, l, drops_only=False).items():
+                if not self._already_alerted(l.id, "new", user_id):
+                    queued += self._queue(l, matched, user_id, now, drop=None)
         for ch in price_changes:
-            if ch.new_price >= ch.old_price or self._already_alerted(ch.listing.id, "price_drop",
-                                                                     ch.new_price):
+            if ch.new_price >= ch.old_price:
                 continue
-            matched = self._match(rules, ch.listing, drops_only=True)
-            if matched:
-                queued += self._queue(ch.listing, matched, now,
-                                      drop=(ch.old_price, ch.new_price))
+            for user_id, matched in self._match(rules, ch.listing, drops_only=True).items():
+                if not self._already_alerted(ch.listing.id, "price_drop", user_id, ch.new_price):
+                    queued += self._queue(ch.listing, matched, user_id, now,
+                                          drop=(ch.old_price, ch.new_price))
         return queued
 
     def _match(self, rules: list[Rule], l: Listing, *, drops_only: bool
-               ) -> list[tuple[Rule, ListingDetail | None]]:
+               ) -> dict[int | None, list[tuple[Rule, ListingDetail | None]]]:
+        """Matching rules grouped by owner. The detail is downloaded at most once."""
         candidates = []
         for rule in rules:
             if drops_only and not rule.price_drop_alert:
@@ -82,16 +103,16 @@ class AlertEngine:
             else:
                 log.debug("Pravidlo „%s“ × %d: %s", rule.name, l.id, reason)
         if not candidates:
-            return []
+            return {}
         detail = self.detail(l.id)
-        matched = []
+        by_user: dict[int | None, list[tuple[Rule, ListingDetail | None]]] = {}
         for rule in candidates:
             reason = check_detail(rule, l, detail)
             if reason is None:
-                matched.append((rule, detail))
+                by_user.setdefault(rule.user_id, []).append((rule, detail))
             else:
                 log.info("Pravidlo „%s“ odmítlo %d po detailu: %s", rule.name, l.id, reason)
-        return matched
+        return by_user
 
     def detail(self, listing_id: int) -> ListingDetail | None:
         """Detail from cache or Sreality. None if unavailable (rule check then decides)."""
@@ -118,9 +139,10 @@ class AlertEngine:
             self.conn.execute("UPDATE listings SET since = ? WHERE id = ?", (d.since, listing_id))
         return d
 
-    def _already_alerted(self, listing_id: int, kind: str, price: int | None = None) -> bool:
-        sql = "SELECT 1 FROM alerts WHERE listing_id = ? AND kind = ?"
-        args: tuple = (listing_id, kind)
+    def _already_alerted(self, listing_id: int, kind: str, user_id: int | None,
+                         price: int | None = None) -> bool:
+        sql = "SELECT 1 FROM alerts WHERE listing_id = ? AND kind = ? AND user_id IS ?"
+        args: tuple = (listing_id, kind, user_id)
         if price is not None:
             sql += " AND price = ?"
             args += (price,)
@@ -129,52 +151,54 @@ class AlertEngine:
     # --- queueing -------------------------------------------------------------------------
 
     def _queue(self, l: Listing, matched: list[tuple[Rule, ListingDetail | None]],
-               now: datetime, drop: tuple[int, int] | None) -> int:
+               user_id: int | None, now: datetime, drop: tuple[int, int] | None) -> int:
         rules = [r for r, _ in matched]
         detail = matched[0][1]
         below = below_median(self.conn, rules[0], l)
         message = listing_message(l, detail, below, [r.name for r in rules], drop)
         status, send_after = quiet_decision(rules, now)
         kind = "price_drop" if drop else "new"
-        n = self._insert(kind, l.id, l.price_czk, rules, message, status, send_after, now)
+        n = self._insert(kind, l.id, l.price_czk, rules, message, status, send_after, now,
+                         user_id)
         what = "Sleva" if drop else "Shoda"
         when = {"queued": "odesílám" if send_after <= now else
                 f"tichý režim, odešlu {send_after.astimezone(TZ).strftime('%H:%M')}",
                 "dropped": "tichý režim, zahazuji"}[status]
-        log.info("%s: %s → %s", what, message.title, when)
+        owner = get_user(self.conn, user_id) if user_id else None
+        log.info("%s%s: %s → %s", what, f" ({owner.name})" if owner else "", message.title, when)
         return n
 
     def _insert(self, kind: str, listing_id: int | None, price: int | None, rules: list[Rule],
-                m: Message, status: str, send_after: datetime, now: datetime) -> int:
-        payload = json.dumps({"url": m.url, "image_url": m.image_url, "phone": m.phone,
-                              "priority": m.priority, "tags": m.tags, "sms": m.sms},
-                             ensure_ascii=False)
+                m: Message, status: str, send_after: datetime, now: datetime,
+                user_id: int | None, *, priority: int | None = None) -> int:
+        """One row per recipient. priority overrides the recipient's own (service/test)."""
         n = 0
         with self.conn:
-            for channel in self.channels:
-                for recipient in channel.recipients:
-                    body = m.sms if channel.notifier.channel == "sms" else m.body
-                    self.conn.execute(
-                        """INSERT INTO alerts (kind, listing_id, price, rule_names, channel,
-                           recipient, title, body, payload, status, send_after, created_at)
-                           VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
-                        (kind, listing_id, price, ", ".join(r.name for r in rules),
-                         channel.notifier.channel, recipient, m.title, body, payload, status,
-                         db.ts(send_after), db.ts(now)))
-                    n += 1
+            for r in self.recipients(user_id):
+                payload = json.dumps(
+                    {"url": m.url, "image_url": m.image_url, "phone": m.phone, "tags": m.tags,
+                     "sms": m.sms, "priority": priority or max(r.priority, m.priority)},
+                    ensure_ascii=False)
+                self.conn.execute(
+                    """INSERT INTO alerts (kind, user_id, listing_id, price, rule_names, channel,
+                       recipient, title, body, payload, status, send_after, created_at)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    (kind, r.user_id, listing_id, price, ", ".join(x.name for x in rules),
+                     r.channel, r.address, m.title, m.body, payload, status, db.ts(send_after),
+                     db.ts(now)))
+                n += 1
         return n
 
     # --- sending --------------------------------------------------------------------------
 
     def dispatch(self, now: datetime) -> int:
         """Send all due alerts. Returns how many were sent."""
-        by_channel = {c.notifier.channel: c.notifier for c in self.channels}
         rows = self.conn.execute(
             "SELECT * FROM alerts WHERE status = 'queued' AND send_after <= ? ORDER BY id",
             (db.ts(now),)).fetchall()
         sent = 0
         for row in rows:
-            notifier = by_channel.get(row["channel"])
+            notifier = self.notifiers.get(row["channel"])
             if notifier is None:
                 continue  # channel was disabled meanwhile; keep it queued
             p = json.loads(row["payload"] or "{}")
@@ -240,10 +264,14 @@ class AlertEngine:
     def _service(self, text: str, now: datetime) -> None:
         self.send_now(service_message(text), now)
 
-    def send_now(self, message: Message, now: datetime) -> int:
-        """Service/test message to every channel, ignoring quiet mode. Returns sent count."""
-        self._insert("service", None, None, [], message, "queued", now, now)
-        return self.dispatch(now)
+    def send_now(self, message: Message, now: datetime, user_id: int | None = None) -> int:
+        """Service/test message ignoring quiet mode; user_id None = admins.
+        Returns how many were sent."""
+        before = self.conn.execute("SELECT COALESCE(MAX(id), 0) FROM alerts").fetchone()[0]
+        self._insert("service", None, None, [], message, "queued", now, now, user_id)
+        self.dispatch(now)
+        return self.conn.execute("SELECT COUNT(*) FROM alerts WHERE id > ? AND status = 'sent'",
+                                 (before,)).fetchone()[0]
 
 
 def quiet_decision(rules: list[Rule], now: datetime) -> tuple[str, datetime]:

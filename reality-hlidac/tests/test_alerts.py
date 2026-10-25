@@ -5,7 +5,8 @@ import pytest
 
 from conftest import load_fixture
 from hlidac import db
-from hlidac.alerts import AlertEngine, Channel
+from hlidac import users
+from hlidac.alerts import AlertEngine
 from hlidac.notify.base import NotifyError
 from hlidac.rules import Rule, save_rule
 from hlidac.sreality.parser import ParseError, parse_search
@@ -46,29 +47,37 @@ def listings(conn):
 
 
 @pytest.fixture
-def setup(conn):
+def owner(conn):
+    user, _ = users.create_user(conn, "Tomas", admin=True, topic="topic", priority=4)
+    return user
+
+
+@pytest.fixture
+def setup(conn, owner):
     ntfy = FakeNotifier("ntfy")
-    sms = FakeNotifier("sms")
+    log = FakeNotifier("console")
     client = FakeClient()
-    engine = AlertEngine(conn, client, [Channel(ntfy, ["topic"]), Channel(sms, ["+420777"])])
-    return engine, ntfy, sms, client
+    engine = AlertEngine(conn, client, {"ntfy": ntfy, "console": log})
+    return engine, ntfy, log, client
 
 
 def add_rule(conn, **kw):
-    base = dict(name="Praha 2", location_type="quarter", location="Praha 2")
+    base = dict(name="Praha 2", location_type="quarter", location="Praha 2", user_id=1)
     base.update(kw)
     save_rule(conn, Rule(**base), NOON)
 
 
 def test_match_queues_and_sends_to_all_channels(conn, listings, setup):
-    engine, ntfy, sms, client = setup
+    engine, ntfy, log, client = setup
     add_rule(conn)
     praha2 = [l for l in listings if l.quarter == "Praha 2"]
     assert engine.process(praha2, [], NOON) == 2 * len(praha2)
     assert client.detail_calls == len(praha2)
     engine.dispatch(NOON)
     assert len(ntfy.sent) == len(praha2)
-    assert sms.sent[0][1].sms.isascii()
+    assert ntfy.sent[0][0] == "topic"
+    assert ntfy.sent[0][1].priority == 4          # the owner's priority
+    assert log.sent[0][0] == "log:Tomas"
     row = conn.execute("SELECT status, rule_names FROM alerts LIMIT 1").fetchone()
     assert row["status"] == "sent" and row["rule_names"] == "Praha 2"
 
@@ -151,7 +160,7 @@ def test_price_drop_needs_rule_flag(conn, listings, setup):
 def test_failed_send_is_retried(conn, listings, setup):
     engine, _, _, _ = setup
     flaky = FakeNotifier("ntfy", fail=1)
-    engine.channels = [Channel(flaky, ["topic"])]
+    engine.notifiers = {"ntfy": flaky}
     add_rule(conn)
     engine.process([listings[0]], [], NOON)
     assert engine.dispatch(NOON) == 0
@@ -204,3 +213,35 @@ def test_watchdog_no_false_recovery_while_still_dead(conn, setup):
     engine.watchdog(NOON + timedelta(minutes=5), None, 600)
     assert len(ntfy.sent) == 1
     assert "zase funguje" not in ntfy.sent[0][1].body
+
+
+def test_two_users_same_flat_each_gets_own_alert(conn, listings, setup):
+    engine, ntfy, _, _ = setup
+    friend, _ = users.create_user(conn, "Petr", topic="petr-topic", priority=5)
+    add_rule(conn, name="Moje")
+    add_rule(conn, name="Petrovo", user_id=friend.id)
+    engine.process([listings[0]], [], NOON)
+    engine.process([listings[0]], [], NOON)  # no duplicates per user
+    engine.dispatch(NOON)
+    by_topic = {t: m for t, m in ntfy.sent}
+    assert set(by_topic) == {"topic", "petr-topic"}
+    assert "Pravidlo: Moje" in by_topic["topic"].body
+    assert "Pravidlo: Petrovo" in by_topic["petr-topic"].body
+    assert by_topic["petr-topic"].priority == 5   # friend wants the highest priority
+
+
+def test_service_messages_go_to_admins_only(conn, setup):
+    engine, ntfy, _, _ = setup
+    users.create_user(conn, "Petr", topic="petr-topic")
+    db.record_run(conn, "poll", NOON - timedelta(hours=1), NOON, True)
+    engine.watchdog(NOON, ConnectionError("x"), 60)
+    assert [t for t, _ in ntfy.sent] == ["topic"]
+
+
+def test_user_without_topic_gets_nothing_on_ntfy(conn, listings, setup):
+    engine, ntfy, log, _ = setup
+    users.update_user(conn, 1, topic=None, priority=4)
+    add_rule(conn)
+    engine.process([listings[0]], [], NOON)
+    engine.dispatch(NOON)
+    assert ntfy.sent == [] and len(log.sent) == 1

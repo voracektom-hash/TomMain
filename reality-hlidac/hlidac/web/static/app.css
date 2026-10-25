@@ -138,3 +138,19 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); o
 table.medians { border-collapse: collapse; width: 100%; font-size: .9rem; }
 .medians th, .medians td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 .medians th:first-child, .medians td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
+
+/* login & accounts */
+.who { margin-left: auto; font-weight: 500; color: var(--muted); }
+.login { max-width: 420px; margin: 24px auto; text-align: center; }
+.login .card { text-align: left; }
+.login img { border-radius: 16px; }
+.login pre { white-space: pre-wrap; background: var(--bg); padding: 10px; border-radius: 8px; font-size: .85rem; }
+input[type=password] { width: 100%; min-height: var(--tap); padding: 10px 12px; font: inherit; font-size: 16px;
+  color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
+.highlight { border: 2px solid var(--primary); }
+.password { font: 600 1.4rem ui-monospace, Menlo, monospace; letter-spacing: .05em; margin: 8px 0; user-select: all; }
+.people { list-style: none; padding: 0; margin: 0 0 12px; }
+.people li { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.people .actions { margin-top: 0; }
+.steps { padding-left: 20px; } .steps li { margin-bottom: 6px; }
+code { background: var(--chip); padding: 1px 6px; border-radius: 6px; word-break: break-all; }

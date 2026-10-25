@@ -3,9 +3,9 @@
 Hlídá nové inzeráty bytů na prodej na Sreality.cz (Praha + Středočeský kraj) a do ~60 s
 od zveřejnění pošle push notifikaci (a později SMS), když byt splní tvoje kritéria.
 
-**Stav:** Fáze 1 (watcher), 2 (pravidla + push notifikace přes ntfy) a 3 (webová appka)
-jsou hotové. Skutečné SMS (SMSbrána.cz) se doplní později, zatím se SMS jen vypisují do
-logu. Nasazení na VPS přijde ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
+**Stav:** Fáze 1 (watcher), 2 (pravidla + push notifikace přes ntfy) a 3 (webová appka
+s účty pro víc lidí) jsou hotové. Notifikace jsou zdarma přes ntfy; SMS (SMSbrána.cz) se
+případně doplní později. Nasazení na VPS přijde ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
 popis Sreality API v [`docs/API.md`](docs/API.md).
 
 ## Co dělá teď
@@ -27,6 +27,11 @@ make dev      # první spuštění vytvoří .venv a .env, spustí watcher i web
 ```
 
 Appka běží na http://localhost:8000. Watcher a appka sdílejí jednu databázi.
+Před prvním přihlášením vytvoř účet správce (vypíše heslo):
+
+```bash
+.venv/bin/python -m hlidac.users add Tomas --admin
+```
 
 Při prvním spuštění watcher asi 7 minut prochází celou nabídku (~8 300 bytů), aby věděl,
 co už existuje. Teprve potom hlásí nové inzeráty. Zastavíš ho klávesami `Ctrl+C`.
@@ -67,7 +72,11 @@ Sdílet → Přidat na plochu.
 | Historie | každá odeslaná / čekající / zahozená zpráva, komu a proč |
 | Mediány | Kč/m² za 90 dní podle obvodu, části, obce a okresu |
 | Stav | poslední kontrola, počty dnes, chyby |
-| Nastavení | kanály, ntfy témata, SMS čísla, testovací notifikace |
+| Nastavení | můj ntfy kanál a priorita, testovací notifikace, návod pro iPhone; správce přidává uživatele |
+
+**Víc uživatelů:** každý má vlastní přihlášení, pravidla, historii, ntfy kanál a prioritu
+notifikací (normální / vysoká / nejvyšší). Správce přidá kamaráda v Nastavení → Uživatelé,
+appka vygeneruje heslo. Sreality se kontroluje jedním dotazem pro všechny.
 
 Appka hlídá i samotný watcher: když 25 minut neproběhne kontrola, pošle servisní notifikaci.
 
@@ -81,7 +90,7 @@ Alternativně z příkazové řádky přes soubor:
 ```bash
 cp pravidla.example.toml pravidla.toml   # vzor s vysvětlivkami u každé položky
 # uprav pravidla.toml v libovolném textovém editoru
-make import-rules                        # nahraje pravidla (stejný název = přepíše)
+make import-rules                        # nahraje pravidla správci (stejný název = přepíše)
 make rules                               # vypíše pravidla
 make preview                             # kolik bytů by které pravidlo chytilo
 ```
@@ -90,13 +99,15 @@ Lokalita může být obvod („Praha 5“), městská část („Praha-Libuš“
 nebo obec („Černošice“). Když název neexistuje, příkaz napoví podobné.
 Změna platí od příští kontroly, watcher není potřeba restartovat.
 
-## Notifikace
+## Notifikace (ntfy, zdarma)
 
-1. Nainstaluj si do telefonu aplikaci **ntfy** (zdarma).
-2. Vymysli tajný název kanálu, třeba `python3 -c "import secrets; print('hlidac-' + secrets.token_urlsafe(12))"`.
-3. V aplikaci se ke kanálu přihlas (Subscribe to topic). Stejně to může udělat i další člověk v rodině.
-4. Do `.env` dej `NOTIFY_CHANNELS=ntfy` a `NTFY_TOPICS=<název kanálu>`.
-5. `make test-notify` pošle testovací notifikaci.
+1. Nainstaluj si do iPhonu aplikaci **ntfy** a povol jí notifikace.
+2. V appce Hlídač otevři **Nastavení** – je tam tvůj osobní ntfy kanál.
+3. V ntfy klepni na **+** a zadej ten kanál.
+4. **Nejvyšší priorita:** Nastavení iPhonu → Oznámení → ntfy → *Časově citlivá oznámení*,
+   a v režimech Soustředění povol časově citlivá oznámení. Pak notifikace projde i přes
+   Soustředění/Spánek (fyzický přepínač ztišení ale nepřebije nic).
+5. Tlačítkem **Poslat testovací notifikaci** ověříš, že to funguje.
 
 Notifikace obsahuje fotku, cenu, Kč/m², srovnání s mediánem, podlaží, vlastnictví,
 makléře a tlačítka „Inzerát“ a „Zavolat“. SMS text (bez diakritiky, max. 2 SMS) se

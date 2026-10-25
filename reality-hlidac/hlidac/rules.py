@@ -30,6 +30,7 @@ class Rule:
     location_type: str
     location: str
     id: int | None = None
+    user_id: int | None = None
     active: bool = True
     max_price: int | None = None
     max_price_m2: int | None = None
@@ -135,7 +136,7 @@ def check_detail(rule: Rule, l: Listing, d: ListingDetail | None) -> str | None:
 
 _JSON_FIELDS = ("dispositions", "ownerships", "exclude_keywords")
 _BOOL_FIELDS = ("active", "no_ground_floor", "price_drop_alert")
-_COLUMNS = ("name", "active", "location_type", "location", "max_price", "max_price_m2",
+_COLUMNS = ("user_id", "name", "active", "location_type", "location", "max_price", "max_price_m2",
             "min_area", "max_area", "dispositions", "ownerships", "min_floor",
             "no_ground_floor", "min_below_median", "exclude_keywords", "quiet_start",
             "quiet_end", "quiet_action", "price_drop_alert")
@@ -150,13 +151,20 @@ def _from_row(row: sqlite3.Row) -> Rule:
     return Rule(id=row["id"], **data)
 
 
-def load_rules(conn: sqlite3.Connection, *, active_only: bool = True) -> list[Rule]:
-    sql = "SELECT * FROM rules" + (" WHERE active = 1" if active_only else "") + " ORDER BY id"
-    return [_from_row(r) for r in conn.execute(sql)]
+def load_rules(conn: sqlite3.Connection, *, active_only: bool = True,
+               user_id: int | None = None) -> list[Rule]:
+    where, args = [], []
+    if active_only:
+        where.append("active = 1")
+    if user_id is not None:
+        where.append("user_id = ?")
+        args.append(user_id)
+    sql = "SELECT * FROM rules" + (" WHERE " + " AND ".join(where) if where else "")
+    return [_from_row(r) for r in conn.execute(sql + " ORDER BY id", args)]
 
 
 def save_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> int:
-    """Insert or update (by name). Returns the rule id."""
+    """Insert or update (by owner + name). Returns the rule id."""
     values = []
     for k in _COLUMNS:
         v = getattr(rule, k)
@@ -169,11 +177,12 @@ def save_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> int:
         conn.execute(
             f"INSERT INTO rules ({', '.join(_COLUMNS)}, created_at, updated_at) "
             f"VALUES ({', '.join('?' * len(_COLUMNS))}, ?, ?) "
-            f"ON CONFLICT(name) DO UPDATE SET "
-            + ", ".join(f"{k} = excluded.{k}" for k in _COLUMNS if k != "name")
+            f"ON CONFLICT(user_id, name) DO UPDATE SET "
+            + ", ".join(f"{k} = excluded.{k}" for k in _COLUMNS if k not in ("name", "user_id"))
             + ", updated_at = excluded.updated_at",
             (*values, ts(now), ts(now)))
-    return conn.execute("SELECT id FROM rules WHERE name = ?", (rule.name,)).fetchone()["id"]
+    return conn.execute("SELECT id FROM rules WHERE name = ? AND user_id IS ?",
+                        (rule.name, rule.user_id)).fetchone()["id"]
 
 
 class DuplicateRuleName(ValueError):
@@ -186,15 +195,16 @@ def get_rule(conn: sqlite3.Connection, rule_id: int) -> Rule | None:
 
 
 def create_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> int:
-    if conn.execute("SELECT 1 FROM rules WHERE name = ?", (rule.name,)).fetchone():
+    if conn.execute("SELECT 1 FROM rules WHERE name = ? AND user_id IS ?",
+                    (rule.name, rule.user_id)).fetchone():
         raise DuplicateRuleName(rule.name)
     return save_rule(conn, rule, now)
 
 
 def update_rule(conn: sqlite3.Connection, rule: Rule, now: datetime) -> None:
     """Update by id (the name may change)."""
-    clash = conn.execute("SELECT 1 FROM rules WHERE name = ? AND id != ?",
-                         (rule.name, rule.id)).fetchone()
+    clash = conn.execute("SELECT 1 FROM rules WHERE name = ? AND user_id IS ? AND id != ?",
+                         (rule.name, rule.user_id, rule.id)).fetchone()
     if clash:
         raise DuplicateRuleName(rule.name)
     values = []

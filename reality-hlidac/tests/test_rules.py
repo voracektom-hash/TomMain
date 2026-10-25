@@ -148,7 +148,10 @@ def test_no_quiet_mode():
 # --- storage and locations ----------------------------------------------------------------
 
 def test_save_and_load_roundtrip(conn):
-    r = rule(dispositions=["2+kk"], ownerships=["osobní"], price_drop_alert=True)
+    from hlidac.users import create_user
+    owner, _ = create_user(conn, "Tomas", admin=True)
+    r = rule(dispositions=["2+kk"], ownerships=["osobní"], price_drop_alert=True,
+             user_id=owner.id)
     save_rule(conn, r, NOW)
     save_rule(conn, replace(r, max_price=5_000_000), NOW)  # same name = update
     loaded = load_rules(conn)

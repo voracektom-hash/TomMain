@@ -1,6 +1,6 @@
 """Manage rules from the command line until the web app exists (phase 3).
 
-  python -m hlidac.rules_cli import pravidla.toml   # add / update rules from a file
+  python -m hlidac.rules_cli import pravidla.toml [Jmeno]   # add / update rules (default: admin)
   python -m hlidac.rules_cli list                   # show rules
   python -m hlidac.rules_cli preview                # how many listings each rule would catch
   python -m hlidac.rules_cli test-notify            # send a test notification
@@ -92,7 +92,8 @@ def rule_from_toml(conn, data: dict) -> Rule:
     return rule
 
 
-def cmd_import(conn, path: str) -> None:
+def cmd_import(conn, path: str, user_name: str | None = None) -> None:
+    owner = _owner(conn, user_name)
     with open(path, "rb") as f:
         data = tomllib.load(f)
     items = data.get("pravidlo", [])
@@ -100,9 +101,23 @@ def cmd_import(conn, path: str) -> None:
         sys.exit("Soubor neobsahuje žádné [[pravidlo]].")
     rules = [rule_from_toml(conn, item) for item in items]  # validate all before saving
     for rule in rules:
+        rule.user_id = owner.id
         save_rule(conn, rule, db.utcnow())
         print(f"✓ {rule.name}  ({locations.TYPE_LABELS[rule.location_type]}: {rule.location})")
-    print(f"Uloženo pravidel: {len(rules)}. Watcher je použije při příští kontrole.")
+    print(f"Uloženo pravidel: {len(rules)} pro {owner.name}. Watcher je použije při příští kontrole.")
+
+
+def _owner(conn, user_name: str | None):
+    from hlidac.users import admins, list_users
+    people = list_users(conn)
+    if not people:
+        raise RuleFileError("Nejdřív vytvoř účet: python -m hlidac.users add Jmeno --admin")
+    if user_name is None:
+        return admins(conn)[0]
+    for u in people:
+        if u.name.lower() == user_name.lower():
+            return u
+    raise RuleFileError(f"Uživatel {user_name} neexistuje.")
 
 
 def describe_rule(r: Rule) -> str:
@@ -153,15 +168,13 @@ def cmd_preview(conn) -> None:
 
 
 def cmd_test_notify(conn, cfg) -> None:
-    from hlidac import settings
-    from hlidac.watcher import build_channels
-    channels = build_channels(cfg, settings.load(conn, cfg))
-    engine = AlertEngine(conn, SrealityClient(cfg.user_agent), channels)
+    from hlidac.watcher import build_notifiers
+    engine = AlertEngine(conn, SrealityClient(cfg.user_agent), build_notifiers(cfg))
     msg = Message(title="Reality Hlídač: test", body="Testovací notifikace. Když ji vidíš, funguje to. ✓",
                   sms="Reality Hlidac: testovaci SMS. Funguje to.", priority=3, tags=["white_check_mark"])
     now = db.utcnow()
     sent = engine.send_now(msg, now)
-    print(f"Odesláno {sent} zpráv přes: {', '.join(c.notifier.channel for c in channels) or 'nic'}")
+    print(f"Odesláno {sent} zpráv (správcům).")
 
 
 def main() -> None:
@@ -170,8 +183,8 @@ def main() -> None:
     conn = db.connect(cfg.db_path)
     args = sys.argv[1:]
     try:
-        if args[:1] == ["import"] and len(args) == 2:
-            cmd_import(conn, args[1])
+        if args[:1] == ["import"] and len(args) in (2, 3):
+            cmd_import(conn, args[1], args[2] if len(args) == 3 else None)
         elif args == ["list"]:
             cmd_list(conn)
         elif args == ["preview"]:

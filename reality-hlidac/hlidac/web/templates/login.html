@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Přihlášení · Reality Hlídač{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+<div class="login">
+  <img src="/static/icon-192.png" alt="" width="72" height="72">
+  <h1>Reality Hlídač</h1>
+  {% if no_users %}
+    <section class="card">
+      <p><strong>Zatím tu není žádný účet.</strong></p>
+      <p class="small">Na serveru vytvoř účet správce příkazem:</p>
+      <pre>docker compose exec web python -m hlidac.users add Jmeno --admin</pre>
+      <p class="small muted">Příkaz vypíše heslo, se kterým se tady přihlásíš.</p>
+    </section>
+  {% else %}
+    <form method="post" action="/login" class="card">
+      {% if error %}<p class="msg err">{{ error }}</p>{% endif %}
+      <label class="field"><span>Jméno</span>
+        <input type="text" name="name" value="{{ name }}" autocomplete="username" autocapitalize="off" required></label>
+      <label class="field"><span>Heslo</span>
+        <input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="btn primary big" type="submit">Přihlásit</button>
+      <p class="small muted">Přihlášení vydrží rok. Heslo ti může Safari uložit.</p>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

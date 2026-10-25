@@ -17,11 +17,13 @@
 </head>
 <body>
   <header class="top">
-    <a href="/" class="brand"><img src="/static/icon-192.png" alt="" width="28" height="28"> Reality Hlídač</a>
+    <a href="/" class="brand"><img src="/static/icon-192.png" alt="" width="28" height="28"> Reality Hlídač
+      {% if user %}<small class="who">{{ user.name }}</small>{% endif %}</a>
   </header>
   <main>
     {% block content %}{% endblock %}
   </main>
+  {% block nav %}
   <nav class="tabs">
     <a href="/" class="{{ 'on' if page == 'rules' }}"><span>⌂</span>Pravidla</a>
     <a href="/alerts" class="{{ 'on' if page == 'alerts' }}"><span>✉</span>Historie</a>
@@ -29,6 +31,7 @@
     <a href="/status" class="{{ 'on' if page == 'status' }}"><span>●</span>Stav</a>
     <a href="/settings" class="{{ 'on' if page == 'settings' }}"><span>⚙</span>Nastavení</a>
   </nav>
+  {% endblock %}
   <script>
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
   </script>

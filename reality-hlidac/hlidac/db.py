@@ -88,9 +88,20 @@ CREATE TABLE IF NOT EXISTS listing_details (
     agency        TEXT
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    password_hash   TEXT NOT NULL,
+    is_admin        INTEGER NOT NULL DEFAULT 0,
+    ntfy_topic      TEXT,
+    priority        INTEGER NOT NULL DEFAULT 4,   -- ntfy: 3 normal, 4 high, 5 urgent
+    created_at      TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS rules (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-    name                TEXT NOT NULL UNIQUE,
+    user_id             INTEGER REFERENCES users(id),   -- owner; gets the alerts
+    name                TEXT NOT NULL,
     active              INTEGER NOT NULL DEFAULT 1,
     location_type       TEXT NOT NULL,     -- 'quarter', 'citypart' or 'city'
     location            TEXT NOT NULL,
@@ -109,12 +120,14 @@ CREATE TABLE IF NOT EXISTS rules (
     quiet_action        TEXT NOT NULL DEFAULT 'defer',  -- 'defer' (send in the morning) or 'drop'
     price_drop_alert    INTEGER NOT NULL DEFAULT 0,
     created_at          TEXT NOT NULL,
-    updated_at          TEXT NOT NULL
+    updated_at          TEXT NOT NULL,
+    UNIQUE (user_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS alerts (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     kind        TEXT NOT NULL,             -- 'new', 'price_drop' or 'service'
+    user_id     INTEGER,                   -- whose alert (NULL = deleted user)
     listing_id  INTEGER REFERENCES listings(id),
     price       INTEGER,                   -- listing price at alert time (dedup of price drops)
     rule_names  TEXT NOT NULL DEFAULT '',
@@ -163,8 +176,30 @@ def connect(path: Path | str) -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")  # watcher and web app read/write concurrently
     conn.execute("PRAGMA busy_timeout=5000")
     conn.execute("PRAGMA foreign_keys=ON")
+    _migrate(conn)
     conn.executescript(SCHEMA)
     return conn
+
+
+def _columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    return {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Upgrade databases created before user accounts existed (phase 1–3)."""
+    rule_cols = _columns(conn, "rules")
+    if rule_cols and "user_id" not in rule_cols:
+        # Rule names become unique per user, which needs a table rebuild in SQLite.
+        cols = ", ".join(c for c in rule_cols)
+        with conn:
+            conn.execute("ALTER TABLE rules RENAME TO rules_old")
+            conn.executescript(SCHEMA)
+            conn.execute(f"INSERT INTO rules ({cols}) SELECT {cols} FROM rules_old")
+            conn.execute("DROP TABLE rules_old")
+    alert_cols = _columns(conn, "alerts")
+    if alert_cols and "user_id" not in alert_cols:
+        with conn:
+            conn.execute("ALTER TABLE alerts ADD COLUMN user_id INTEGER")
 
 
 @dataclass(frozen=True)

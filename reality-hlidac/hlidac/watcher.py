@@ -15,8 +15,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Callable
 
-from hlidac import config, db, medians, schedule, settings
-from hlidac.alerts import AlertEngine, Channel
+from hlidac import config, db, medians, schedule
+from hlidac.alerts import AlertEngine
 from hlidac.notify.console import ConsoleNotifier
 from hlidac.notify.ntfy import NtfyNotifier
 from hlidac.rules import load_rules
@@ -231,8 +231,6 @@ class Watcher:
                          describe(ch.listing))
             self.maybe_compute_medians()
             if self.alerts:
-                # Settings may have changed in the web app since the last check.
-                self.alerts.channels = build_channels(self.cfg, settings.load(self.conn, self.cfg))
                 self.alerts.process(result.new, result.price_changes, self.now())
         except RateLimited as exc:
             error = exc
@@ -273,25 +271,14 @@ class Watcher:
             self.sleep(delay)
 
 
-def build_channels(cfg: config.Config, s: settings.Settings) -> list[Channel]:
-    channels = []
-    for name in s.channels:
-        if name == "ntfy":
-            if not s.ntfy_topics:
-                log.debug("Kanál ntfy je zapnutý, ale nemá žádné téma – vynechávám")
-                continue
-            channels.append(Channel(NtfyNotifier(cfg.ntfy_server, cfg.ntfy_token),
-                                    list(s.ntfy_topics)))
-        elif name == "sms":
-            if cfg.sms_provider != "console":
-                log.debug("SMS provider „%s“ zatím není implementovaný – používám console",
-                          cfg.sms_provider)
-            channels.append(Channel(ConsoleNotifier("sms"), list(s.sms_recipients) or ["test"]))
-        elif name == "console":
-            channels.append(Channel(ConsoleNotifier(), ["log"]))
-        else:
-            log.warning("Neznámý kanál „%s“ – vynechávám", name)
-    return channels
+def build_notifiers(cfg: config.Config) -> dict:
+    """Delivery channels. Recipients (ntfy topics, priorities) live in the users table."""
+    notifiers: dict = {}
+    if "ntfy" in cfg.notify_channels:
+        notifiers["ntfy"] = NtfyNotifier(cfg.ntfy_server, cfg.ntfy_token)
+    if "console" in cfg.notify_channels:
+        notifiers["console"] = ConsoleNotifier()
+    return notifiers
 
 
 def main() -> None:
@@ -301,10 +288,11 @@ def main() -> None:
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     conn = db.connect(cfg.db_path)
     client = SrealityClient(cfg.user_agent)
-    channels = build_channels(cfg, settings.load(conn, cfg))
-    log.info("Kanály: %s", ", ".join(f"{c.notifier.channel} ({len(c.recipients)} příjemců)"
-                                       for c in channels) or "žádné")
-    watcher = Watcher(conn, client, cfg, alerts=AlertEngine(conn, client, channels))
+    from hlidac.users import list_users
+    people = list_users(conn)
+    log.info("Uživatelé: %s", ", ".join(u.name for u in people) or
+             "žádní – vytvoř účet: python -m hlidac.users add Jmeno --admin")
+    watcher = Watcher(conn, client, cfg, alerts=AlertEngine(conn, client, build_notifiers(cfg)))
     try:
         watcher.run_forever()
     except (KeyboardInterrupt, SystemExit):

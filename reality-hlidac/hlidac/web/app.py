@@ -5,12 +5,10 @@ Run with:  python -m hlidac.web.app      (port 8000, or WEB_PORT)
 
 from __future__ import annotations
 
-import base64
 import json
 import logging
 import os
 import re
-import secrets
 import sqlite3
 import threading
 from contextlib import asynccontextmanager
@@ -25,8 +23,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.datastructures import FormData
 
-from hlidac import config, db, locations, rules, settings
+from hlidac import config, db, locations, rules, users
 from hlidac.alerts import AlertEngine
+from hlidac.web import auth
 from hlidac.notify.base import Message
 from hlidac.preview import preview
 from hlidac.rules import Rule
@@ -38,7 +37,6 @@ log = logging.getLogger("hlidac")
 HERE = Path(__file__).parent
 WEB_WATCHDOG_EVERY_S = 300
 WEB_WATCHDOG_INTERVAL_S = 600  # watchdog fires after 2.5 × this = 25 min without a poll
-PHONE_RE = re.compile(r"^\+?\d{9,15}$")
 TOPIC_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
 
 
@@ -84,6 +82,7 @@ templates.env.globals.update(DISPOSITIONS=DISPOSITIONS, OWNERSHIPS=OWNERSHIPS,
 
 def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True) -> FastAPI:
     cfg = cfg or config.load()
+    limiter = auth.LoginLimiter()
 
     def get_conn() -> Iterator[sqlite3.Connection]:
         conn = db.connect(cfg.db_path)
@@ -93,9 +92,8 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
             conn.close()
 
     def engine(conn: sqlite3.Connection) -> AlertEngine:
-        from hlidac.watcher import build_channels
-        return AlertEngine(conn, SrealityClient(cfg.user_agent),
-                           build_channels(cfg, settings.load(conn, cfg)))
+        from hlidac.watcher import build_notifiers
+        return AlertEngine(conn, SrealityClient(cfg.user_agent), build_notifiers(cfg))
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -107,42 +105,85 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
 
     app = FastAPI(title="Reality Hlídač", lifespan=lifespan, docs_url=None, redoc_url=None)
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
-    password = config_password()
 
     @app.middleware("http")
-    async def basic_auth(request: Request, call_next):
-        # Optional – only when WEB_PASSWORD is set (the Caddy/public variant).
-        if password and request.url.path not in ("/healthz",):
-            header = request.headers.get("authorization", "")
-            ok = False
-            if header.startswith("Basic "):
-                try:
-                    _, _, given = base64.b64decode(header[6:]).decode().partition(":")
-                    ok = secrets.compare_digest(given, password)
-                except ValueError:
-                    ok = False
-            if not ok:
-                return Response(status_code=401,
-                                headers={"WWW-Authenticate": 'Basic realm="Reality Hlidac"'})
+    async def require_login(request: Request, call_next):
+        path = request.url.path
+        request.state.user = None
+        if path in PUBLIC_PATHS or path.startswith("/static/"):
+            return await call_next(request)
+        conn = db.connect(cfg.db_path)
+        try:
+            user_id = auth.read_session(auth.secret_key(conn), request.cookies.get(auth.COOKIE))
+            user = users.get_user(conn, user_id) if user_id else None
+        finally:
+            conn.close()
+        if user is None:
+            if request.headers.get("hx-request"):
+                return Response(status_code=401, headers={"HX-Redirect": "/login"})
+            return RedirectResponse("/login", status_code=303)
+        request.state.user = user
         return await call_next(request)
 
-    def render(request: Request, name: str, status_code: int = 200, **ctx) -> HTMLResponse:
-        return templates.TemplateResponse(request, name, ctx, status_code=status_code)
+    def render(request: Request, template: str, status_code: int = 200, **ctx) -> HTMLResponse:
+        ctx.setdefault("user", request.state.user)
+        return templates.TemplateResponse(request, template, ctx, status_code=status_code)
+
+    def me(request: Request) -> users.User:
+        return request.state.user
+
+    def own_rule(conn: sqlite3.Connection, request: Request, rule_id: int) -> Rule | None:
+        rule = rules.get_rule(conn, rule_id)
+        return rule if rule and rule.user_id == me(request).id else None
+
+    # --- login -----------------------------------------------------------------------------
+
+    @app.get("/login", response_class=HTMLResponse)
+    def login_page(request: Request, conn=Depends(get_conn)):
+        return render(request, "login.html", error=None, name="",
+                      no_users=not users.list_users(conn))
+
+    @app.post("/login", response_class=HTMLResponse)
+    async def login(request: Request, conn=Depends(get_conn)):
+        form = await request.form()
+        ip = client_ip(request)
+        name = (form.get("name") or "").strip()
+        if limiter.blocked(ip):
+            return render(request, "login.html", 429, name=name, no_users=False,
+                          error="Příliš mnoho pokusů. Zkus to znovu za 15 minut.")
+        user = users.authenticate(conn, name, form.get("password") or "")
+        if user is None:
+            limiter.fail(ip)
+            return render(request, "login.html", 401, name=name, no_users=False,
+                          error="Špatné jméno nebo heslo.")
+        limiter.reset(ip)
+        response = RedirectResponse("/", status_code=303)
+        response.set_cookie(auth.COOKIE, auth.make_session(auth.secret_key(conn), user.id),
+                            max_age=auth.SESSION_DAYS * 86400, httponly=True, samesite="lax",
+                            secure=is_https(request))
+        return response
+
+    @app.post("/logout")
+    def logout():
+        response = RedirectResponse("/login", status_code=303)
+        response.delete_cookie(auth.COOKIE)
+        return response
 
     # --- rules -----------------------------------------------------------------------------
 
     @app.get("/", response_class=HTMLResponse)
     def rules_page(request: Request, conn=Depends(get_conn)):
-        all_rules = rules.load_rules(conn, active_only=False)
+        uid = me(request).id
+        own = rules.load_rules(conn, active_only=False, user_id=uid)
         last_alert = {r["rule_names"]: r["created_at"] for r in conn.execute(
             "SELECT rule_names, MAX(created_at) AS created_at FROM alerts "
-            "WHERE kind != 'service' GROUP BY rule_names")}
-        return render(request, "rules.html", page="rules", rules=all_rules,
+            "WHERE kind != 'service' AND user_id = ? GROUP BY rule_names", (uid,))}
+        return render(request, "rules.html", page="rules", rules=own,
                       describe=describe_rule, last_alert=last_alert)
 
     @app.post("/rules/{rule_id}/toggle", response_class=HTMLResponse)
     def toggle(request: Request, rule_id: int, conn=Depends(get_conn)):
-        rule = rules.get_rule(conn, rule_id)
+        rule = own_rule(conn, request, rule_id)
         if rule is None:
             return Response(status_code=404)
         rules.set_active(conn, rule_id, not rule.active, db.utcnow())
@@ -157,7 +198,7 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
 
     @app.get("/rules/{rule_id}", response_class=HTMLResponse)
     def edit_rule(request: Request, rule_id: int, conn=Depends(get_conn)):
-        rule = rules.get_rule(conn, rule_id)
+        rule = own_rule(conn, request, rule_id)
         if rule is None:
             return RedirectResponse("/", status_code=303)
         return render(request, "rule_form.html", page="rules", rule=rule, errors={},
@@ -165,7 +206,7 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
 
     @app.get("/rules/{rule_id}/duplicate", response_class=HTMLResponse)
     def duplicate_rule(request: Request, rule_id: int, conn=Depends(get_conn)):
-        rule = rules.get_rule(conn, rule_id)
+        rule = own_rule(conn, request, rule_id)
         if rule is None:
             return RedirectResponse("/", status_code=303)
         copy = replace(rule, id=None, name=f"{rule.name} (kopie)")
@@ -176,6 +217,9 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
     async def save_rule(request: Request, conn=Depends(get_conn)):
         form = await request.form()
         rule, errors = rule_from_form(conn, form)
+        rule.user_id = me(request).id
+        if rule.id and own_rule(conn, request, rule.id) is None:
+            return RedirectResponse("/", status_code=303)
         if not errors:
             try:
                 if rule.id:
@@ -183,15 +227,16 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
                 else:
                     rules.create_rule(conn, rule, db.utcnow())
             except rules.DuplicateRuleName:
-                errors["name"] = "Pravidlo s tímto názvem už existuje."
+                errors["name"] = "Pravidlo s tímto názvem už máš."
         if errors:
             return render(request, "rule_form.html", 422, page="rules", rule=rule,
                           errors=errors, is_new=not rule.id)
         return RedirectResponse("/", status_code=303)
 
     @app.post("/rules/{rule_id}/delete")
-    def remove_rule(rule_id: int, conn=Depends(get_conn)):
-        rules.delete_rule(conn, rule_id)
+    def remove_rule(request: Request, rule_id: int, conn=Depends(get_conn)):
+        if own_rule(conn, request, rule_id):
+            rules.delete_rule(conn, rule_id)
         return RedirectResponse("/", status_code=303)
 
     @app.post("/rules/preview", response_class=HTMLResponse)
@@ -216,16 +261,15 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
     def alerts_page(request: Request, page: int = 1, conn=Depends(get_conn)):
         per_page = 40
         rows = conn.execute(
-            """SELECT a.*, l.price_czk AS current_price FROM alerts a
-               LEFT JOIN listings l ON l.id = a.listing_id
+            """SELECT a.* FROM alerts a WHERE a.user_id = ?
                ORDER BY a.id DESC LIMIT ? OFFSET ?""",
-            (per_page + 1, (page - 1) * per_page)).fetchall()
+            (me(request).id, per_page + 1, (page - 1) * per_page)).fetchall()
         return render(request, "alerts.html", page="alerts", rows=rows[:per_page],
                       page_no=page, has_next=len(rows) > per_page)
 
     @app.get("/status", response_class=HTMLResponse)
     def status_page(request: Request, conn=Depends(get_conn)):
-        return render(request, "status.html", page="status", s=status_data(conn))
+        return render(request, "status.html", page="status", s=status_data(conn, me(request)))
 
     @app.get("/medians", response_class=HTMLResponse)
     def medians_page(request: Request, scope: str = "quarter", q: str = "",
@@ -233,40 +277,95 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
         return render(request, "medians.html", page="medians", scope=scope, q=q,
                       rows=median_rows(conn, scope, q))
 
+    # --- settings: own account + (admin) users -------------------------------------------
+
+    def settings_ctx(conn: sqlite3.Connection, request: Request, **extra) -> dict:
+        ctx = dict(page="settings", me=users.get_user(conn, me(request).id),
+                   people=users.list_users(conn) if me(request).is_admin else [],
+                   PRIORITIES=users.PRIORITIES, ntfy_server=cfg.ntfy_server,
+                   errors={}, notice=None, new_password=None)
+        ctx.update(extra)
+        return ctx
+
     @app.get("/settings", response_class=HTMLResponse)
     def settings_page(request: Request, conn=Depends(get_conn)):
-        return render(request, "settings.html", page="settings",
-                      s=settings.load(conn, cfg), errors={}, saved=False,
-                      sms_provider=cfg.sms_provider)
+        return render(request, "settings.html", **settings_ctx(conn, request))
 
     @app.post("/settings", response_class=HTMLResponse)
     async def settings_save(request: Request, conn=Depends(get_conn)):
         form = await request.form()
-        s, errors = settings_from_form(form)
+        topic = (form.get("ntfy_topic") or "").strip()
+        priority = int(form.get("priority") or users.DEFAULT_PRIORITY)
+        errors = {}
+        if topic and not TOPIC_RE.match(topic):
+            errors["ntfy_topic"] = "Jen písmena, čísla, - a _ (max. 64 znaků)."
+        if priority not in users.PRIORITIES:
+            errors["priority"] = "Neplatná priorita."
         if not errors:
-            settings.save(conn, s)
-        return render(request, "settings.html", 422 if errors else 200, page="settings",
-                      s=s, errors=errors, saved=not errors, sms_provider=cfg.sms_provider)
+            users.update_user(conn, me(request).id, topic=topic, priority=priority)
+        return render(request, "settings.html", 422 if errors else 200,
+                      **settings_ctx(conn, request, errors=errors,
+                                     notice=None if errors else "Uloženo."))
+
+    @app.post("/settings/password", response_class=HTMLResponse)
+    def new_own_password(request: Request, conn=Depends(get_conn)):
+        password = users.set_password(conn, me(request).id)
+        return render(request, "settings.html", **settings_ctx(
+            conn, request, new_password=(me(request).name, password)))
 
     @app.post("/settings/test", response_class=HTMLResponse)
-    def settings_test(conn=Depends(get_conn)):
+    def settings_test(request: Request, conn=Depends(get_conn)):
         eng = engine(conn)
-        if not eng.channels:
-            return HTMLResponse('<p class="msg err">Žádný kanál není zapnutý.</p>')
+        targets = eng.recipients(me(request).id)
+        if not targets:
+            return HTMLResponse('<p class="msg err">Nemáš nastavený ntfy kanál.</p>')
         msg = Message(title="Reality Hlídač: test",
                       body="Testovací notifikace z appky. Když ji vidíš, funguje to. ✓",
-                      sms="Reality Hlidac: testovaci SMS z appky. Funguje to.",
-                      tags=["white_check_mark"])
-        sent = eng.send_now(msg, db.utcnow())
-        total = sum(len(c.recipients) for c in eng.channels)
-        failed = conn.execute(
-            "SELECT channel, error FROM alerts WHERE kind = 'service' AND status = 'queued' "
-            "AND error IS NOT NULL ORDER BY id DESC LIMIT ?", (total - sent,)).fetchall()
-        css = "ok" if sent == total else "err"
-        text = f"Odesláno {sent} z {total}."
-        if failed:
-            text += " Chyba: " + "; ".join(f"{r['channel']}: {r['error'][:120]}" for r in failed)
+                      sms="Reality Hlidac: testovaci zprava.", tags=["white_check_mark"])
+        sent = eng.send_now(msg, db.utcnow(), user_id=me(request).id)
+        css = "ok" if sent == len(targets) else "err"
+        text = f"Odesláno {sent} z {len(targets)}."
+        if sent < len(targets):
+            last = conn.execute("SELECT error FROM alerts WHERE kind = 'service' AND user_id = ? "
+                                "AND error IS NOT NULL ORDER BY id DESC LIMIT 1",
+                                (me(request).id,)).fetchone()
+            if last:
+                text += f" Chyba: {last['error'][:160]}"
         return HTMLResponse(f'<p class="msg {css}">{escape(text)}</p>')
+
+    @app.post("/users", response_class=HTMLResponse)
+    async def add_user(request: Request, conn=Depends(get_conn)):
+        if not me(request).is_admin:
+            return Response(status_code=403)
+        form = await request.form()
+        try:
+            user, password = users.create_user(conn, form.get("name") or "",
+                                                admin=form.get("is_admin") == "1")
+        except users.UserError as exc:
+            return render(request, "settings.html", 422,
+                          **settings_ctx(conn, request, errors={"new_user": str(exc)}))
+        return render(request, "settings.html", **settings_ctx(
+            conn, request, new_password=(user.name, password)))
+
+    @app.post("/users/{user_id}/password", response_class=HTMLResponse)
+    def reset_password(request: Request, user_id: int, conn=Depends(get_conn)):
+        user = users.get_user(conn, user_id)
+        if not me(request).is_admin or user is None:
+            return Response(status_code=403)
+        password = users.set_password(conn, user_id)
+        return render(request, "settings.html", **settings_ctx(
+            conn, request, new_password=(user.name, password)))
+
+    @app.post("/users/{user_id}/delete", response_class=HTMLResponse)
+    def remove_user(request: Request, user_id: int, conn=Depends(get_conn)):
+        if not me(request).is_admin or user_id == me(request).id:
+            return Response(status_code=403)
+        try:
+            users.delete_user(conn, user_id)
+        except users.UserError as exc:
+            return render(request, "settings.html", 422,
+                          **settings_ctx(conn, request, errors={"new_user": str(exc)}))
+        return RedirectResponse("/settings", status_code=303)
 
     # --- PWA + health ----------------------------------------------------------------------
 
@@ -282,8 +381,20 @@ def create_app(cfg: config.Config | None = None, *, start_watchdog: bool = True)
     return app
 
 
-def config_password() -> str | None:
-    return os.environ.get("WEB_PASSWORD") or None
+PUBLIC_PATHS = {"/login", "/healthz", "/sw.js"}
+
+
+def client_ip(request: Request) -> str:
+    # Behind Caddy the real client is the last X-Forwarded-For entry (Caddy appends it).
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[-1].strip()
+    return request.client.host if request.client else "?"
+
+
+def is_https(request: Request) -> bool:
+    return (request.url.scheme == "https"
+            or request.headers.get("x-forwarded-proto", "").lower() == "https")
 
 
 def escape(text: str) -> str:
@@ -362,22 +473,6 @@ def rule_from_form(conn: sqlite3.Connection, form: FormData, *,
     return rule, errors
 
 
-def settings_from_form(form: FormData) -> tuple[settings.Settings, dict[str, str]]:
-    errors: dict[str, str] = {}
-    lines = lambda key: tuple(  # noqa: E731
-        x.strip() for x in re.split(r"[\n,;]+", form.get(key) or "") if x.strip())
-    topics = lines("ntfy_topics")
-    phones = tuple(p.replace(" ", "") for p in lines("sms_recipients"))
-    bad = [t for t in topics if not TOPIC_RE.match(t)]
-    if bad:
-        errors["ntfy_topics"] = f"Neplatný název kanálu: {', '.join(bad)} (jen písmena, čísla, - a _)."
-    bad = [p for p in phones if not PHONE_RE.match(p)]
-    if bad:
-        errors["sms_recipients"] = f"Neplatné číslo: {', '.join(bad)} (např. +420777123456)."
-    channels = tuple(c for c in settings.CHANNELS if form.get(f"ch_{c}") == "1")
-    return settings.Settings(channels=channels, ntfy_topics=topics, sms_recipients=phones), errors
-
-
 # --- page data -----------------------------------------------------------------------------
 
 def describe_rule(r: Rule) -> list[str]:
@@ -425,7 +520,8 @@ def search_locations(conn: sqlite3.Connection, q: str, limit: int = 12) -> list[
     return out[:limit]
 
 
-def status_data(conn: sqlite3.Connection) -> dict:
+def status_data(conn: sqlite3.Connection, user: users.User) -> dict:
+    """Watcher health is shared; alert and rule counts are the user's own."""
     q = lambda sql, *a: conn.execute(sql, a).fetchone()[0]  # noqa: E731
     midnight = datetime.now(TZ).replace(hour=0, minute=0, second=0, microsecond=0)
     day_ago = db.ts(db.utcnow() - timedelta(hours=24))
@@ -438,13 +534,16 @@ def status_data(conn: sqlite3.Connection) -> dict:
         polls_today=q("SELECT COUNT(*) FROM runs WHERE kind = 'poll' AND ok = 1 AND started_at >= ?", today),
         new_today=q("SELECT COUNT(*) FROM listings WHERE from_sweep = 0 AND first_seen >= ?", today),
         drops_today=q("SELECT COUNT(*) FROM price_history WHERE changed_at >= ? AND new_price < old_price", today),
-        alerts_today=q("SELECT COUNT(*) FROM alerts WHERE status = 'sent' AND kind != 'service' AND created_at >= ?", today),
-        alerts_failed=q("SELECT COUNT(*) FROM alerts WHERE status = 'failed' AND created_at >= ?", day_ago),
-        alerts_waiting=q("SELECT COUNT(*) FROM alerts WHERE status = 'queued'"),
+        alerts_today=q("SELECT COUNT(*) FROM alerts WHERE status = 'sent' AND kind != 'service' "
+                       "AND created_at >= ? AND user_id = ?", today, user.id),
+        alerts_failed=q("SELECT COUNT(*) FROM alerts WHERE status = 'failed' AND created_at >= ? "
+                        "AND user_id = ?", day_ago, user.id),
+        alerts_waiting=q("SELECT COUNT(*) FROM alerts WHERE status = 'queued' AND user_id = ?",
+                         user.id),
         errors=conn.execute("SELECT started_at, error FROM runs WHERE ok = 0 AND started_at >= ? "
                             "ORDER BY id DESC LIMIT 10", (day_ago,)).fetchall(),
         listings=q("SELECT COUNT(*) FROM listings WHERE removed_at IS NULL"),
-        rules_active=q("SELECT COUNT(*) FROM rules WHERE active = 1"),
+        rules_active=q("SELECT COUNT(*) FROM rules WHERE active = 1 AND user_id = ?", user.id),
         watchdog_alarm=db.get_meta(conn, "watchdog_alarm") == "1",
         sweep_done=db.get_meta(conn, "sweep_done"),
     )

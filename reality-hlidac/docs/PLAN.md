@@ -59,9 +59,10 @@ reality-hlidac/
 │   │   └── format.py         # texty: push s diakritikou, SMS ASCII ≤ 2 segmenty
 │   ├── watcher.py            # hlavní smyčka + watchdog
 │   ├── preview.py            # „kolik bytů by pravidlo chytilo“
-│   ├── settings.py           # nastavení v DB (výchozí hodnoty z .env)
+│   ├── users.py              # účty, hesla, ntfy kanál a priorita každého uživatele
 │   └── web/
 │       ├── app.py            # FastAPI routy, formuláře, watchdog vlákno
+│       ├── auth.py           # přihlášení (podepsaná cookie), limit pokusů
 │       ├── templates/        # Jinja2 + HTMX
 │       └── static/           # CSS, manifest.json, ikony, service worker
 ├── scripts/

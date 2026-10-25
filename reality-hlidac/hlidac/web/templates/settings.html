@@ -3,39 +3,83 @@
 {% macro err(key) %}{% if errors.get(key) %}<p class="field-err">{{ errors[key] }}</p>{% endif %}{% endmacro %}
 {% block content %}
 <h1>Nastavení</h1>
-{% if saved %}<p class="msg ok">Uloženo. Platí od příští kontroly.</p>{% endif %}
-<form method="post" action="/settings">
-  <section class="card">
-    <h2>Kanály</h2>
-    <label class="check big"><input type="checkbox" name="ch_ntfy" value="1" {{ 'checked' if 'ntfy' in s.channels }}> Push notifikace (ntfy)</label>
-    <label class="check big"><input type="checkbox" name="ch_sms" value="1" {{ 'checked' if 'sms' in s.channels }}> SMS
-      {% if sms_provider == 'console' %}<small class="muted">(zatím jen do logu, SMS brána není napojená)</small>{% endif %}</label>
-    <label class="check"><input type="checkbox" name="ch_console" value="1" {{ 'checked' if 'console' in s.channels }}> Výpis do logu</label>
+{% if notice %}<p class="msg ok">{{ notice }}</p>{% endif %}
+{% if new_password %}
+  <section class="card highlight">
+    <strong>Heslo pro {{ new_password[0] }}:</strong>
+    <p class="password">{{ new_password[1] }}</p>
+    <p class="small muted">Zobrazí se jen teď. Pošli ho bezpečně (třeba osobně nebo přes Signal/WhatsApp) a stránku zavři.</p>
   </section>
-
-  <section class="card">
-    <h2>ntfy kanály</h2>
-    <label class="field"><span>Jeden na řádek. Ke stejnému kanálu se může přihlásit víc telefonů.</span>
-      <textarea name="ntfy_topics" rows="2" autocapitalize="off" spellcheck="false">{{ s.ntfy_topics | join('\n') }}</textarea>
-      {{ err('ntfy_topics') }}</label>
-    <p class="small muted">Název kanálu funguje jako heslo – kdo ho zná, vidí tvoje notifikace.</p>
-  </section>
-
-  <section class="card">
-    <h2>Telefonní čísla pro SMS</h2>
-    <label class="field"><span>Jedno na řádek, např. +420777123456</span>
-      <textarea name="sms_recipients" rows="2" inputmode="tel">{{ s.sms_recipients | join('\n') }}</textarea>
-      {{ err('sms_recipients') }}</label>
-  </section>
-
-  <button class="btn primary big" type="submit">Uložit</button>
-</form>
+{% endif %}
 
 <section class="card">
-  <h2>Test</h2>
-  <p class="small muted">Pošle testovací zprávu do všech zapnutých kanálů (podle uloženého nastavení).</p>
+  <h2>Můj účet · {{ me.name }}{% if me.is_admin %} <span class="badge">správce</span>{% endif %}</h2>
+  <form method="post" action="/settings">
+    <label class="field"><span>ntfy kanál (téma)</span>
+      <input type="text" name="ntfy_topic" value="{{ me.ntfy_topic or '' }}" autocapitalize="off" spellcheck="false">
+      {{ err('ntfy_topic') }}</label>
+    <div class="field">
+      <span>Priorita notifikací</span>
+      <div class="chip-select">
+        {% for value, label in PRIORITIES.items() %}
+        <label><input type="radio" name="priority" value="{{ value }}" {{ 'checked' if me.priority == value }}><span>{{ label }}</span></label>
+        {% endfor %}
+      </div>
+      <small class="muted">„Nejvyšší“ = časově citlivá notifikace, projde i režimem Soustředění (návod níže).</small>
+    </div>
+    <button class="btn primary big" type="submit">Uložit</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Jak nastavit iPhone</h2>
+  <ol class="small steps">
+    <li>Nainstaluj z App Store aplikaci <strong>ntfy</strong> a povol jí notifikace.</li>
+    <li>V ntfy klepni na <strong>+</strong> a zadej kanál <code>{{ me.ntfy_topic or '(nejdřív ho výš ulož)' }}</code>. Server nech výchozí.</li>
+    <li>Pro „nejvyšší“ prioritu: <em>Nastavení iPhonu → Oznámení → ntfy</em> → zapni <strong>Časově citlivá oznámení</strong>.</li>
+    <li>A v <em>Nastavení → Soustředění</em> (např. Spánek) → <em>Aplikace</em> → zapni <strong>Časově citlivá oznámení</strong> nebo přidej ntfy mezi povolené.</li>
+    <li>Tlačítkem níže pošli test.</li>
+  </ol>
+  <p class="small muted">Kanál funguje jako heslo – kdo ho zná, vidí tvoje notifikace. Fyzický přepínač ztišení žádná notifikace nepřebije.</p>
   <button class="btn big" hx-post="/settings/test" hx-target="#test-result" hx-disabled-elt="this">Poslat testovací notifikaci</button>
   <div id="test-result"></div>
 </section>
-<p class="small muted">Tichý režim se nastavuje u každého pravidla zvlášť.</p>
+
+{% if me.is_admin %}
+<section class="card">
+  <h2>Uživatelé</h2>
+  <ul class="people">
+    {% for p in people %}
+    <li>
+      <div><strong>{{ p.name }}</strong>{% if p.is_admin %} <span class="badge">správce</span>{% endif %}
+        <small class="muted">priorita {{ PRIORITIES.get(p.priority) }}</small></div>
+      <div class="actions">
+        <form method="post" action="/users/{{ p.id }}/password"><button class="btn">Nové heslo</button></form>
+        {% if p.id != me.id %}
+        <form method="post" action="/users/{{ p.id }}/delete"
+              onsubmit='return confirm({{ ("Smazat uživatele " ~ p.name ~ " i s jeho pravidly?") | tojson }})'>
+          <button class="btn danger">Smazat</button></form>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <form method="post" action="/users" class="add-user">
+    <label class="field"><span>Přidat uživatele (jméno)</span>
+      <input type="text" name="name" placeholder="např. Petr" required>{{ err('new_user') }}</label>
+    <label class="check"><input type="checkbox" name="is_admin" value="1"> Správce (vidí uživatele a servisní hlášení)</label>
+    <button class="btn primary big" type="submit">Přidat a vygenerovat heslo</button>
+  </form>
+  <p class="small muted">Každý vidí jen svoje pravidla a historii. Nový uživatel dostane vlastní ntfy kanál, který najde po přihlášení tady v Nastavení.</p>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Přihlášení</h2>
+  <div class="actions">
+    <form method="post" action="/settings/password"
+          onsubmit="return confirm('Vygenerovat nové heslo? Staré přestane platit.')"><button class="btn">Nové heslo pro mě</button></form>
+    <form method="post" action="/logout"><button class="btn">Odhlásit</button></form>
+  </div>
+</section>
 {% endblock %}

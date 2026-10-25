@@ -12,11 +12,11 @@
   <div><strong>{{ s.polls_today }}</strong><span>kontrol dnes</span></div>
   <div><strong>{{ s.new_today }}</strong><span>nových bytů dnes</span></div>
   <div><strong>{{ s.drops_today }}</strong><span>slev dnes</span></div>
-  <div><strong>{{ s.alerts_today }}</strong><span>alertů dnes</span></div>
+  <div><strong>{{ s.alerts_today }}</strong><span>mých alertů dnes</span></div>
   <div><strong>{{ s.alerts_waiting }}</strong><span>čeká (tichý režim)</span></div>
   <div><strong>{{ s.alerts_failed }}</strong><span>selhalo za 24 h</span></div>
   <div><strong>{{ s.listings | thousands }}</strong><span>bytů v nabídce</span></div>
-  <div><strong>{{ s.rules_active }}</strong><span>aktivních pravidel</span></div>
+  <div><strong>{{ s.rules_active }}</strong><span>mých aktivních pravidel</span></div>
 </div>
 
 <section class="card">
@@ -30,6 +30,5 @@
 <section class="card">
   <h2>Ostatní</h2>
   <p class="small">Poslední kontrola celé nabídky: {{ s.sweep_done | local if s.sweep_done else 'zatím ne' }}</p>
-  <p class="small">Kredit SMS brány: <span class="muted">SMS brána zatím není napojená.</span></p>
 </section>
 {% endblock %}
