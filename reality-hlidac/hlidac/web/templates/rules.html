@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Pravidla · Reality Hlídač{% endblock %}
+{% block content %}
+<div class="head-row">
+  <h1>Pravidla</h1>
+  <a class="btn primary" href="/rules/new">+ Nové</a>
+</div>
+{% if not rules %}
+  <div class="empty">
+    <p>Zatím žádné pravidlo. Pravidlo = lokalita + co hledáš.</p>
+    <a class="btn primary big" href="/rules/new">Vytvořit první pravidlo</a>
+  </div>
+{% endif %}
+<div class="cards">
+  {% for rule in rules %}{% include "_rule_card.html" %}{% endfor %}
+</div>
+<p class="hint">Notifikace přijde, když byt splní aspoň jedno aktivní pravidlo. Změny platí od příští kontroly.</p>
+{% endblock %}

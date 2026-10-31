@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% block title %}Reality Hlídač{% endblock %}</title>
+  <meta name="theme-color" content="#1f5fbf">
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <link rel="icon" href="/static/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Hlídač">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a href="/" class="brand"><img src="/static/icon-192.png" alt="" width="28" height="28"> Reality Hlídač
+      {% if user %}<small class="who">{{ user.name }}</small>{% endif %}</a>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% block nav %}
+  <nav class="tabs">
+    <a href="/" class="{{ 'on' if page == 'rules' }}"><span>⌂</span>Pravidla</a>
+    <a href="/alerts" class="{{ 'on' if page == 'alerts' }}"><span>✉</span>Historie</a>
+    <a href="/medians" class="{{ 'on' if page == 'medians' }}"><span>≈</span>Mediány</a>
+    <a href="/status" class="{{ 'on' if page == 'status' }}"><span>●</span>Stav</a>
+    <a href="/settings" class="{{ 'on' if page == 'settings' }}"><span>⚙</span>Nastavení</a>
+  </nav>
+  {% endblock %}
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Nové pravidlo' if is_new else rule.name }} · Reality Hlídač{% endblock %}
+{% macro err(key) %}{% if errors.get(key) %}<p class="field-err">{{ errors[key] }}</p>{% endif %}{% endmacro %}
+{% macro num(v, scale=1) %}{% if v is not none %}{{ '%g' % (v / scale) }}{% endif %}{% endmacro %}
+{% block content %}
+<div class="head-row">
+  <h1>{{ 'Nové pravidlo' if is_new else 'Upravit pravidlo' }}</h1>
+  <a class="btn" href="/">Zpět</a>
+</div>
+
+<form method="post" action="/rules/save" class="rule-form" id="rule-form"
+      hx-post="/rules/preview" hx-target="#preview" hx-swap="innerHTML"
+      hx-trigger="load, change, keyup delay:700ms">
+  {% if rule.id %}<input type="hidden" name="id" value="{{ rule.id }}">{% endif %}
+
+  <section class="card">
+    <label class="field">
+      <span>Název</span>
+      <input type="text" name="name" value="{{ rule.name }}" placeholder="např. Smíchov 2+kk do 8M" required>
+      {{ err('name') }}
+    </label>
+    <label class="field">
+      <span>Lokalita</span>
+      <input type="text" name="location" value="{{ rule.location }}" list="loc-list" autocomplete="off"
+             placeholder="Praha 5, Smíchov, Černošice…" required
+             hx-get="/locations" hx-trigger="input changed delay:250ms" hx-target="#loc-list"
+             hx-swap="innerHTML" hx-sync="this:replace">
+      <datalist id="loc-list"></datalist>
+      <small class="muted">Obvod (Praha 1–22), městská část (Praha-Libuš), část (Karlín) nebo obec (Černošice).</small>
+      {{ err('location') }}
+    </label>
+    <label class="check big">
+      <input type="checkbox" name="active" value="1" {{ 'checked' if rule.active }}> Aktivní
+    </label>
+  </section>
+
+  <section class="card">
+    <h2>Byt</h2>
+    <div class="field">
+      <span>Dispozice <small class="muted">(nic = jakákoliv)</small></span>
+      <div class="chip-select">
+        {% for d in DISPOSITIONS %}
+        <label><input type="checkbox" name="dispositions" value="{{ d }}" {{ 'checked' if d in rule.dispositions }}><span>{{ d }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row2">
+      <label class="field"><span>Plocha od (m²)</span>
+        <input inputmode="decimal" name="min_area" value="{{ num(rule.min_area) }}">{{ err('min_area') }}</label>
+      <label class="field"><span>Plocha do (m²)</span>
+        <input inputmode="decimal" name="max_area" value="{{ num(rule.max_area) }}">{{ err('max_area') }}</label>
+    </div>
+    <div class="field">
+      <span>Vlastnictví <small class="muted">(nic = jakékoliv)</small></span>
+      <div class="chip-select">
+        {% for o in OWNERSHIPS %}
+        <label><input type="checkbox" name="ownerships" value="{{ o }}" {{ 'checked' if o in rule.ownerships }}><span>{{ o }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row2">
+      <label class="field"><span>Min. podlaží <small class="muted">(1 = přízemí)</small></span>
+        <input inputmode="numeric" name="min_floor" value="{{ num(rule.min_floor) }}">{{ err('min_floor') }}</label>
+      <label class="check"><input type="checkbox" name="no_ground_floor" value="1" {{ 'checked' if rule.no_ground_floor }}> Bez přízemí</label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Cena</h2>
+    <div class="row2">
+      <label class="field"><span>Max. cena (mil. Kč)</span>
+        <input inputmode="decimal" name="max_price_m" value="{{ num(rule.max_price, 1000000) }}" placeholder="8,5">{{ err('max_price_m') }}</label>
+      <label class="field"><span>Max. cena za m² (tis. Kč)</span>
+        <input inputmode="decimal" name="max_price_m2_k" value="{{ num(rule.max_price_m2, 1000) }}" placeholder="150">{{ err('max_price_m2_k') }}</label>
+    </div>
+    <label class="field"><span>Aspoň o kolik % levnější než medián lokality</span>
+      <input inputmode="decimal" name="min_below_median" value="{{ num(rule.min_below_median) }}" placeholder="např. 10">{{ err('min_below_median') }}</label>
+    <label class="check"><input type="checkbox" name="price_drop_alert" value="1" {{ 'checked' if rule.price_drop_alert }}> Upozornit i na snížení ceny</label>
+  </section>
+
+  <section class="card">
+    <h2>Vyloučit</h2>
+    <label class="field"><span>Slova v inzerátu <small class="muted">(oddělit čárkou, stačí základní tvar)</small></span>
+      <input type="text" name="exclude_keywords" value="{{ rule.exclude_keywords | join(', ') }}"></label>
+  </section>
+
+  <section class="card">
+    <h2>Tichý režim</h2>
+    <label class="check"><input type="checkbox" name="quiet_on" value="1" {{ 'checked' if rule.quiet_start is not none }}> Zapnutý</label>
+    <div class="row2">
+      <label class="field"><span>Od (hodina)</span>
+        <select name="quiet_start">{% for h in range(24) %}<option value="{{ h }}" {{ 'selected' if h == (rule.quiet_start if rule.quiet_start is not none else 22) }}>{{ h }}:00</option>{% endfor %}</select></label>
+      <label class="field"><span>Do (hodina)</span>
+        <select name="quiet_end">{% for h in range(24) %}<option value="{{ h }}" {{ 'selected' if h == (rule.quiet_end if rule.quiet_end is not none else 7) }}>{{ h }}:00</option>{% endfor %}</select></label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="quiet_action" value="defer" {{ 'checked' if rule.quiet_action != 'drop' }}> Poslat ráno</label>
+      <label><input type="radio" name="quiet_action" value="drop" {{ 'checked' if rule.quiet_action == 'drop' }}> Neposílat vůbec</label>
+    </div>
+    {{ err('quiet') }}
+  </section>
+
+  <section class="card preview-card">
+    <h2>Náhled</h2>
+    <div id="preview"><p class="muted">Počítám…</p></div>
+  </section>
+
+  <div class="sticky-save">
+    <button class="btn primary big" type="submit">Uložit pravidlo</button>
+  </div>
+</form>
+{% endblock %}

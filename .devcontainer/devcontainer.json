@@ -1,0 +1,12 @@
+{
+  "name": "Reality Hlídač",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "cd reality-hlidac && make install && cp -n .env.example .env",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "Reality Hlídač", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "codespaces": { "openFiles": ["reality-hlidac/docs/NASAZENI.md"] }
+  }
+}

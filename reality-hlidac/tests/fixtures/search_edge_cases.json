@@ -1,0 +1,109 @@
+{
+ "pagination": {
+  "limit": 5,
+  "offset": 0,
+  "total": 8270
+ },
+ "results": [
+  {
+   "advert_images": [],
+   "advert_name": "Prodej bytu 2+kk 63 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "hash_id": 727322700,
+   "locality": {
+    "country": "Česká republika",
+    "country_id": 112,
+    "municipality": null,
+    "municipality_id": 3468,
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Vinohrady",
+    "district": "Praha 1",
+    "district_id": 5001,
+    "entity_type": "ward",
+    "gps_lat": 50.0754556910567,
+    "gps_lon": 14.438059495944463,
+    "inaccuracy_type": "ward",
+    "quarter": null,
+    "quarter_id": -1,
+    "street": "",
+    "street_id": -1,
+    "ward": null,
+    "ward_id": 14967
+   },
+   "premise_id": 76480,
+   "price": 12490000.0,
+   "price_czk": 12490000.0,
+   "price_czk_m2": 198254,
+   "price_summary_czk": 12490000.0,
+   "user_id": 319879
+  },
+  {
+   "advert_images": [],
+   "advert_name": "Prodej bytu 2+kk 82 m²",
+   "category_main_cb": {
+    "name": "Byty",
+    "value": 1
+   },
+   "category_sub_cb": {
+    "name": "2+kk",
+    "value": 4
+   },
+   "category_type_cb": {
+    "name": "Prodej",
+    "value": 1
+   },
+   "hash_id": 3063681100,
+   "locality": {
+    "country": "Česká republika",
+    "country_id": 112,
+    "municipality": null,
+    "municipality_id": 3468,
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": "Staré Město",
+    "district": "Praha 1",
+    "district_id": 5001,
+    "entity_type": "street",
+    "gps_lat": 50.09160745331757,
+    "gps_lon": 14.427047007742962,
+    "inaccuracy_type": "street",
+    "quarter": "Praha 1",
+    "quarter_id": 87,
+    "street": "Hradební",
+    "street_id": 119768,
+    "ward": null,
+    "ward_id": 13674
+   },
+   "premise": {
+    "city_seo_name": "",
+    "quarter_seo_name": "",
+    "seo_name": "",
+    "ward_seo_name": ""
+   },
+   "premise_id": null,
+   "price": 0.0,
+   "price_czk": 0.0,
+   "price_czk_m2": 0,
+   "price_summary_czk": 0.0,
+   "user_id": null
+  }
+ ],
+ "status_code": 200,
+ "status_message": "OK"
+}
