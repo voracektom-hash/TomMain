@@ -201,3 +201,39 @@ def test_catch_up_ignores_bumped_old_listings(conn):
     result = w.poll_once()
     assert result.pages == 2
     assert sorted(l.id for l in result.new) == [10_001, 10_002, 10_003, 10_004, 10_005]
+
+
+def test_backup_keeps_seven_days(tmp_path):
+    import gzip
+    import sqlite3
+    from hlidac.backup import backup_now, seconds_until
+    db_file = tmp_path / "hlidac.db"
+    c = db.connect(db_file)
+    c.execute("INSERT INTO meta (key, value) VALUES ('x', 'y')")
+    c.commit()
+    for day in range(1, 11):
+        backup_now(db_file, keep_days=7, today=datetime(2026, 10, day, 3, 30, tzinfo=schedule.TZ))
+    files = sorted(p.name for p in (tmp_path / "backups").iterdir())
+    assert files[0] == "hlidac-2026-10-04.db.gz" and len(files) == 7
+    restored = tmp_path / "restored.db"
+    restored.write_bytes(gzip.decompress((tmp_path / "backups" / files[-1]).read_bytes()))
+    assert sqlite3.connect(restored).execute("SELECT value FROM meta WHERE key='x'").fetchone() == ("y",)
+    noon = datetime(2026, 10, 21, 12, 0, tzinfo=schedule.TZ)
+    assert seconds_until("03:30", noon) == 15.5 * 3600
+
+
+def test_adding_a_region_triggers_silent_sweep(conn):
+    from dataclasses import replace
+    all_items = items()
+    w, _ = make(conn, [page(all_items)])
+    w.sweep(initial=True)
+    assert not w.sweep_due()
+    w.cfg = replace(CFG, region_ids=(10,))      # different from the swept (10, 11)
+    assert w.regions_changed() and w.sweep_due()
+    extra = copy.deepcopy(all_items[0])
+    extra["hash_id"] = 777
+    w.client.pages = [page(all_items + [extra]), page(all_items + [extra])]
+    w.step()
+    row = conn.execute("SELECT from_sweep FROM listings WHERE id = 777").fetchone()
+    assert row["from_sweep"] == 1                # existing offer of the new region is not "new"
+    assert not w.sweep_due()

@@ -8,7 +8,7 @@
 | 1 — Watcher | adaptivní poller (60 s ±10 s přes den), SQLite, historie cen, mediány 90 dní | ✅ hotovo |
 | 2 — Pravidla + notifikace | filtr pravidel, ntfy push + SMS (console; SMSbrána později), tichý režim, watchdog | ✅ hotovo (bez SMSbrány) |
 | 3 — Appka | FastAPI + Jinja2 + HTMX, PWA, 6 obrazovek + mediány, druhý watchdog | ✅ hotovo |
-| 4 — Nasazení | Docker Compose, Tailscale, zálohy, `docs/NASAZENI.md` | čeká |
+| 4 — Nasazení | Docker Compose, Caddy + HTTPS (sslip.io), zálohy, `install.sh`, `docs/NASAZENI.md` (Oracle Free / Hetzner) | ✅ hotovo |
 
 ## Architektura
 
@@ -34,7 +34,8 @@ reality-hlidac/
 ├── Makefile                  # make dev / make test
 ├── pyproject.toml            # závislosti (httpx, fastapi, jinja2, pytest)
 ├── .env.example              # SMS klíče, telefony, nastavení – s komentáři
-├── docker-compose.yml        # watcher + web + backup, restart: unless-stopped
+├── docker-compose.yml        # watcher + web + backup + caddy, restart: unless-stopped
+├── Caddyfile                 # HTTPS (Let's Encrypt) před appkou
 ├── Dockerfile
 ├── docs/
 │   ├── PLAN.md
@@ -58,6 +59,7 @@ reality-hlidac/
 │   │   ├── console.py        # výpis do logu (i jako SMS náhrada)
 │   │   └── format.py         # texty: push s diakritikou, SMS ASCII ≤ 2 segmenty
 │   ├── watcher.py            # hlavní smyčka + watchdog
+│   ├── backup.py             # denní záloha SQLite, 7 dní
 │   ├── preview.py            # „kolik bytů by pravidlo chytilo“
 │   ├── users.py              # účty, hesla, ntfy kanál a priorita každého uživatele
 │   └── web/
@@ -68,7 +70,8 @@ reality-hlidac/
 ├── scripts/
 │   ├── dev.sh                # lokálně watcher + appka
 │   ├── make_icons.py         # ikony PWA
-│   └── backup.sh             # denní záloha, 7 dní retence (Fáze 4)
+│   ├── install.sh            # instalace na server jedním příkazem
+│   └── update.sh             # aktualizace na novou verzi
 └── tests/
     ├── fixtures/             # uložené JSON odpovědi Sreality
     ├── test_parser.py

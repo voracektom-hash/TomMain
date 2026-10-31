@@ -1,11 +1,12 @@
 # Reality Hlídač
 
-Hlídá nové inzeráty bytů na prodej na Sreality.cz (Praha + Středočeský kraj) a do ~60 s
+Hlídá nové inzeráty bytů na prodej na Sreality.cz (Praha; Středočeský kraj jde zapnout v `.env`) a do ~60 s
 od zveřejnění pošle push notifikaci (a později SMS), když byt splní tvoje kritéria.
 
-**Stav:** Fáze 1 (watcher), 2 (pravidla + push notifikace přes ntfy) a 3 (webová appka
-s účty pro víc lidí) jsou hotové. Notifikace jsou zdarma přes ntfy; SMS (SMSbrána.cz) se
-případně doplní později. Nasazení na VPS přijde ve Fázi 4. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
+**Stav:** všechny 4 fáze jsou hotové – watcher, pravidla, push notifikace přes ntfy
+(zdarma), webová appka s účty pro víc lidí a nasazení na server jedním příkazem.
+**Jak to rozjet na serveru zdarma: [`docs/NASAZENI.md`](docs/NASAZENI.md).**
+SMS (SMSbrána.cz) se případně doplní později. Plán je v [`docs/PLAN.md`](docs/PLAN.md),
 popis Sreality API v [`docs/API.md`](docs/API.md).
 
 ## Co dělá teď
@@ -33,7 +34,7 @@ Před prvním přihlášením vytvoř účet správce (vypíše heslo):
 .venv/bin/python -m hlidac.users add Tomas --admin
 ```
 
-Při prvním spuštění watcher asi 7 minut prochází celou nabídku (~8 300 bytů), aby věděl,
+Při prvním spuštění watcher asi 5 minut prochází celou nabídku (~6 000 bytů v Praze), aby věděl,
 co už existuje. Teprve potom hlásí nové inzeráty. Zastavíš ho klávesami `Ctrl+C`.
 
 Další příkazy:

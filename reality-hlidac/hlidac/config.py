@@ -45,7 +45,7 @@ def load(env_file: str | Path = ".env") -> Config:
     env = os.environ
     return Config(
         db_path=Path(env.get("DB_PATH", "data/hlidac.db")),
-        region_ids=tuple(int(x) for x in env.get("REGION_IDS", "10,11").split(",") if x.strip()),
+        region_ids=tuple(int(x) for x in env.get("REGION_IDS", "10").split(",") if x.strip()),
         page_limit=int(env.get("PAGE_LIMIT", "60")),
         user_agent=env.get("USER_AGENT", DEFAULT_USER_AGENT),
         log_level=env.get("LOG_LEVEL", "INFO").upper(),

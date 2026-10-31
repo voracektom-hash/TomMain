@@ -176,13 +176,21 @@ class Watcher:
         db.record_run(self.conn, "sweep", started, self.now(), True, n_results=total or 0,
                       n_new=n_new, pages=pages)
         db.set_meta(self.conn, "sweep_done", db.ts(self.now()))
+        db.set_meta(self.conn, "sweep_regions", ",".join(map(str, sorted(self.cfg.region_ids))))
         self.prev_ids = None  # next poll compares against what the sweep saw
         log.info("%s: hotovo – %d inzerátů, %d nově uložených, %d staženo z nabídky",
                  label, total or 0, n_new, removed)
 
+    def regions_changed(self) -> bool:
+        """REGION_IDS differs from what the last sweep covered (e.g. Středočeský kraj added)."""
+        swept = db.get_meta(self.conn, "sweep_regions")
+        current = ",".join(map(str, sorted(self.cfg.region_ids)))
+        # Databases from before this check have no record; they covered the old default.
+        return swept is not None and swept != current
+
     def sweep_due(self) -> bool:
         last = db.get_meta(self.conn, "sweep_done")
-        if last is None:
+        if last is None or self.regions_changed():
             return True
         now = self.now()
         local_hour = now.astimezone(schedule.TZ).hour
@@ -219,7 +227,9 @@ class Watcher:
         error: Exception | None = None
         try:
             if self.sweep_due():
-                first = db.get_meta(self.conn, "sweep_done") is None
+                # Initial sweep (also for newly added regions) stores the existing offer
+                # silently, so it is never reported as "new".
+                first = db.get_meta(self.conn, "sweep_done") is None or self.regions_changed()
                 self.sweep(initial=first)
             result = self.poll_once()
             self.failures = 0
