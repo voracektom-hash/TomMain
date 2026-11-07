@@ -8,7 +8,7 @@ Celkem asi 45 minut, většinu času se čeká.
 | 0. Vyzkoušet appku v prohlížeči (nepovinné) | GitHub Codespaces | 10 min | zdarma |
 | 1. Server | Oracle Cloud (web) | 15 min | zdarma natrvalo |
 | 2. Otevřít porty | Oracle Cloud (web) | 3 min | – |
-| 3. Připojit se na server | Terminál na Macu | 2 min | – |
+| 3. Připojit se na server | Terminál (Mac) / PowerShell (Windows) | 2 min | – |
 | 4. Instalace | Terminál (na serveru) | 10 min | – |
 | 5. iPhone | Safari + aplikace ntfy | 5 min | zdarma |
 
@@ -104,6 +104,34 @@ ssh -i ~/Downloads/ssh-key-*.key ubuntu@141.147.12.34
 ↑ Připojí tě na server. Místo `141.147.12.34` napiš svou Public IP.
 Na otázku *„Are you sure you want to continue connecting?“* napiš `yes`.
 Když vidíš `ubuntu@hlidac:~$`, jsi na serveru – všechny další příkazy píšeš sem.
+
+---
+
+### Windows (např. Dell): PowerShell místo Terminálu
+
+**Aplikace: Windows PowerShell** (Start → napiš „PowerShell“). SSH je ve Windows 10/11 vestavěné.
+
+```powershell
+mkdir $HOME\.ssh -Force
+```
+↑ Vytvoří složku na klíče.
+
+```powershell
+Move-Item $HOME\Downloads\ssh-key-*.key $HOME\.ssh\hlidac.key
+```
+↑ Přesune klíč ze Stažených souborů a přejmenuje ho.
+
+```powershell
+icacls $HOME\.ssh\hlidac.key /inheritance:r /grant:r "$($env:USERNAME):(R)"
+```
+↑ Zamkne klíč jen pro tebe (obdoba `chmod 600`), jinak ho SSH odmítne.
+
+```powershell
+ssh -i $HOME\.ssh\hlidac.key ubuntu@141.147.12.34
+```
+↑ Připojí tě na server (napiš svou IP). Vkládá se pravým tlačítkem myši nebo Ctrl+V.
+
+V údržbě níže pak místo `-i ~/Downloads/ssh-key-*.key` používej `-i $HOME\.ssh\hlidac.key`.
 
 ---
 
