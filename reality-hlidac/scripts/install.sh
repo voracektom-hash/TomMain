@@ -13,6 +13,15 @@ warn() { printf '  \033[33m! %s\033[0m\n' "$*"; }
 
 [ "$(id -u)" -eq 0 ] || { echo "Spusť přes sudo: sudo ./scripts/install.sh"; exit 1; }
 
+# Small servers (e.g. Oracle VM.Standard.E2.1.Micro with 1 GB RAM) need swap for the build.
+MEM_MB=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)
+if [ "$MEM_MB" -lt 2000 ] && ! swapon --show | grep -q .; then
+  say "0/7 Swap 2 GB (server má jen ${MEM_MB} MB paměti)"
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  ok "swap zapnutý"
+fi
+
 say "1/7 Docker"
 if ! command -v docker >/dev/null 2>&1; then
   curl -fsSL https://get.docker.com | sh

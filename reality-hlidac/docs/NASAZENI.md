@@ -60,9 +60,15 @@ Po 30 minutách nečinnosti se uspí, takže **na nepřetržité hlídání nen�
 4. **Create.** Za 1–2 minuty bude stav **Running**. Na stránce instance si opiš
    **Public IP address** (např. `141.147.12.34`).
 
-> **„Out of capacity“?** Zdarma servery Ampere bývají ve Frankfurtu občas rozebrané.
-> Zkus jinou *Availability domain* (AD-2, AD-3), nebo to zkus za pár hodin.
-> Případně tvar **VM.Standard.E2.1.Micro** (také Always Free, slabší, ale stačí).
+> **„Out of capacity“?** Zdarma servery Ampere bývají ve Frankfurtu často rozebrané.
+> Zkus v kroku *Placement* jinou *Availability domain* (AD 2, AD 3). Když nejde žádná,
+> vyber v AD 1 tvar **Specialty and previous generation → VM.Standard.E2.1.Micro**
+> (také Always Free; 1 GB paměti hlídači stačí, instalace si sama přidá 2 GB swap).
+
+> **Přepínač „Automatically assign public IPv4 address“ nejde zapnout?** Když síť
+> vytváříš přímo v průvodci, nová konzole ho zamkne. Server vytvoř i tak a veřejnou IP
+> přidej potom: stránka instance → **Networking / Attached VNICs** → název VNIC →
+> **IPv4 addresses** → ⋮ → **Edit** → **Ephemeral public IP** → **Update**.
 
 ---
 
