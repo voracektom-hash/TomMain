@@ -1,0 +1,12 @@
+# HTTPS in front of the web app. SITE_ADDRESS comes from .env, e.g.
+# hlidac.203-0-113-7.sslip.io  -> Caddy gets a free Let's Encrypt certificate automatically.
+{$SITE_ADDRESS} {
+	encode gzip
+	reverse_proxy web:8000
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		-Server
+	}
+}

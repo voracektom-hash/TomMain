@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Stav · Reality Hlídač{% endblock %}
+{% block content %}
+<h1>Stav</h1>
+<section class="card status-hero {{ 'ok' if s.healthy else 'bad' }}">
+  <strong>{{ 'Hlídač běží' if s.healthy else 'Hlídač neběží nebo nemá spojení' }}</strong>
+  <span>Poslední úspěšná kontrola: {{ s.last_ok | local }} ({{ s.last_ok | ago }})</span>
+  {% if s.watchdog_alarm %}<span>Watchdog hlásí problém – podrobnosti v Historii.</span>{% endif %}
+</section>
+
+<div class="stats grid">
+  <div><strong>{{ s.polls_today }}</strong><span>kontrol dnes</span></div>
+  <div><strong>{{ s.new_today }}</strong><span>nových bytů dnes</span></div>
+  <div><strong>{{ s.drops_today }}</strong><span>slev dnes</span></div>
+  <div><strong>{{ s.alerts_today }}</strong><span>mých alertů dnes</span></div>
+  <div><strong>{{ s.alerts_waiting }}</strong><span>čeká (tichý režim)</span></div>
+  <div><strong>{{ s.alerts_failed }}</strong><span>selhalo za 24 h</span></div>
+  <div><strong>{{ s.listings | thousands }}</strong><span>bytů v nabídce</span></div>
+  <div><strong>{{ s.rules_active }}</strong><span>mých aktivních pravidel</span></div>
+</div>
+
+<section class="card">
+  <h2>Chyby za 24 h</h2>
+  {% if not s.errors %}<p class="muted">Žádné.</p>{% endif %}
+  <ul class="plain">
+    {% for e in s.errors %}<li><small class="muted">{{ e.started_at | local }}</small> {{ e.error }}</li>{% endfor %}
+  </ul>
+</section>
+
+<section class="card">
+  <h2>Ostatní</h2>
+  <p class="small">Poslední kontrola celé nabídky: {{ s.sweep_done | local if s.sweep_done else 'zatím ne' }}</p>
+</section>
+{% endblock %}

@@ -1,0 +1,331 @@
+{
+ "result": {
+  "acceptance_year": null,
+  "advert_code": "20639",
+  "advert_description": "Kde v centru Prahy najdete světlý a prostorný byt s možností parkování, lodžií, balkonem a velkorysými úložnými prostory? Jeden takový právě nabízíme k prodeji v cihlovém domě na Praze 2.\r\n\r\nByt o dispozici 3+1 se nachází ve 2. nadzemním podlaží a jeho podlahová plocha činí 91,4 m². Je v dobrém a udržovaném stavu a lze jej ihned užívat, zároveň však nabízí zajímavý potenciál pro budoucí rekonstrukci podle vlastních představ. V podlaží pod bytem se nacházejí funkční lékařské ordinace.\r\n\r\nVýměry jednotlivých místností:\r\n\r\nchodba  8,71 m²\r\npokoj  14,01 m²\r\nkoupelna  7,95 m²\r\nsamostatné WC  1,12 m²\r\nobývací pokoj  25,45 m²\r\nkuchyně  10,76 m²\r\nspíž  0,50 m²\r\npokoj  15,42 m²\r\nkomora  0,53 m²\r\n\r\nK bytu náleží balkon o výměře 1,20 m² a lodžie o výměře 4,20 m², které nabízejí příjemný venkovní prostor pro posezení, relaxaci nebo pěstování květin. Výhled do klidného vnitrobloku a zeleně přilehlé zahrady vodáren dává téměř zapomenout, že bydlíte v širším centru Prahy.\r\n\r\nVelkým benefitem je také nadstandardně prostorná sklepní kóje o výměře 11,7 m², která poskytuje dostatek místa pro kola, sportovní vybavení i sezónní věci. V domě je navíc k dispozici společná kolárna.\r\n\r\nVýznamnou výhodou je možnost parkování ve vnitřním dvoře domu, kterou mohou využívat majitelé bytů. V této části Prahy jde o velmi praktický a vyhledávaný benefit.\r\n\r\nVýborná je také dopravní dostupnost. Stanice metra C a tramvajové zastávky I. P. Pavlova jsou vzdáleny přibližně 5 minut chůze, takže se rychle dostanete do centra i dalších částí Prahy.",
+  "advert_images": [
+   {
+    "ai_edited": false,
+    "alt": "",
+    "height": 1200,
+    "id": 1013845019,
+    "kind": 2,
+    "order": 1,
+    "url": "//d18-a.sdn.cz/d_18/c_img_qG_A/kcKfrMAkFDvG5qOa9H7y3Ou/2836.jpeg",
+    "width": 1801
+   }
+  ],
+  "advert_name": "Prodej bytu 3+1 91 m²",
+  "annuity": null,
+  "balcony": true,
+  "balcony_area": null,
+  "basin": false,
+  "basin_area": null,
+  "beginning_date": null,
+  "building_area": null,
+  "building_condition": {
+   "name": "Velmi dobrý",
+   "value": 1
+  },
+  "building_type": {
+   "name": "Cihlová",
+   "value": 2
+  },
+  "category_main_cb": {
+   "name": "Byty",
+   "value": 1
+  },
+  "category_sub_cb": {
+   "name": "3+1",
+   "value": 7
+  },
+  "category_type_cb": {
+   "name": "Prodej",
+   "value": 1
+  },
+  "cellar": true,
+  "cellar_area": null,
+  "circuit_breaker_cb": null,
+  "cost_of_living": "",
+  "discount_show": false,
+  "easy_access": {
+   "name": "Ne",
+   "value": 2
+  },
+  "edited": "2026-10-21",
+  "electricity_set": [],
+  "elevator": {
+   "name": "Ano",
+   "value": 1
+  },
+  "energy_efficiency_rating_cb": {
+   "name": "E - Nehospodárná",
+   "value": 5
+  },
+  "energy_performance_certificate": {
+   "name": "č. 78/2013 Sb.",
+   "value": 2
+  },
+  "energy_performance_summary": 154.0,
+  "exclusively_at_rk": false,
+  "finish_date": null,
+  "first_tour_date": null,
+  "first_tour_date_to": null,
+  "flat_class": {
+   "name": "- vyber typ",
+   "value": 0
+  },
+  "floor_area": 103,
+  "floor_number": 2,
+  "floors": 7,
+  "furnished": {
+   "name": "- vyber vybavení",
+   "value": 0
+  },
+  "garage": false,
+  "garage_count": null,
+  "garden_area": null,
+  "garret": null,
+  "gas_set": [],
+  "gully_set": [],
+  "hash_id": 1725177932,
+  "heating_element_set": [],
+  "heating_set": [
+   {
+    "name": "Ústřední plynové",
+    "value": 4
+   }
+  ],
+  "heating_source_set": [],
+  "internet_connection_provider": null,
+  "internet_connection_speed": null,
+  "internet_connection_type_set": [],
+  "keywords": null,
+  "labels": [
+   {
+    "description": "MINI MARKET Na Bojišti",
+    "distance": 93.0,
+    "imgUrl": "https://api.mapy.cz/poiimg/icon/423",
+    "lat": 50.07315444946289,
+    "lines": [],
+    "lon": 14.42766284942627,
+    "name": "small_shop",
+    "photo_url": "https://d48-a.sdn.cz/d_48/c_img_oa_A/kBkJRwehYVnG3GDoDarBdF/f844.jpeg",
+    "rating": -1,
+    "review_count": 0,
+    "source": "firm",
+    "source_id": 13288569,
+    "url": "https://www.firmy.cz/detail/13288569-mini-market-na-bojisti-praha-nove-mesto.html"
+   }
+  ],
+  "labels_extended": {},
+  "locality": {
+   "city": "Praha",
+   "city_seo_name": "praha",
+   "citypart": "Nové Město",
+   "citypart_seo_name": "nove-mesto",
+   "country": "Česká republika",
+   "country_id": 112,
+   "country_seo_name": "ceska-republika",
+   "district": "Praha 2",
+   "district_id": 5002,
+   "district_seo_name": "praha-2",
+   "entity_type": "address",
+   "geometry": {
+    "bounding_box": {},
+    "geometry": [],
+    "geometry_type": null
+   },
+   "gps_lat": 50.072322320331246,
+   "gps_lon": 14.427744506393502,
+   "housenumber": "461",
+   "inaccuracy_type": "address",
+   "municipality": null,
+   "municipality_id": 3468,
+   "municipality_seo_name": null,
+   "quarter": "Praha 2",
+   "quarter_id": 88,
+   "quarter_seo_name": "praha-2",
+   "region": "Hlavní město Praha",
+   "region_id": 10,
+   "region_seo_name": "hlavni-mesto-praha",
+   "street": "Ke Karlovu",
+   "street_id": 120103,
+   "street_seo_name": "ke-karlovu",
+   "streetnumber": "8",
+   "ward": null,
+   "ward_id": 14959,
+   "ward_seo_name": null,
+   "zip": 12000
+  },
+  "loggia": true,
+  "loggia_area": null,
+  "low_energy": false,
+  "matterport_url": "https://my.matterport.com/show/?m=e59PfDZzxJz",
+  "object_age": null,
+  "object_location": {
+   "name": "- vyber umístění",
+   "value": 0
+  },
+  "ownership": {
+   "name": "Osobní",
+   "value": 1
+  },
+  "panorama": false,
+  "panorama_data": {
+   "distance": null,
+   "has_panorama": false,
+   "pid": null,
+   "yaw": null
+  },
+  "parking": null,
+  "parking_lots": true,
+  "personal": {
+   "name": "- vyber možnost",
+   "value": 0
+  },
+  "phase_distributions_cb": null,
+  "premise": {
+   "ask_id": 13365785,
+   "company": {
+    "company_ic": 17180031,
+    "company_subject_id": 4151875,
+    "sos_custom_advert_card": false
+   },
+   "id": 55953,
+   "locality": {
+    "city": "Praha",
+    "city_seo_name": "praha",
+    "citypart": null,
+    "citypart_seo_name": null,
+    "country": null,
+    "country_seo_name": null,
+    "district": "Praha 2",
+    "district_id": 5002,
+    "district_seo_name": "praha-2",
+    "entity_id": 9096715,
+    "entity_type": "address",
+    "gps_lat": 50.0723219444,
+    "gps_lon": 14.4277445063935,
+    "housenumber": "461",
+    "municipality": null,
+    "municipality_id": 3468,
+    "municipality_seo_name": null,
+    "quarter": "Praha 2",
+    "quarter_id": 88,
+    "quarter_seo_name": "praha-2",
+    "region": "Hlavní město Praha",
+    "region_id": 10,
+    "region_seo_name": "hlavni-mesto-praha",
+    "street": "Ke Karlovu",
+    "street_id": 120103,
+    "street_seo_name": "ke-karlovu",
+    "streetnumber": "8",
+    "ward": "Nové Město",
+    "ward_id": 14959,
+    "ward_seo_name": "nove-mesto",
+    "zip": 12000
+   },
+   "logo": "https://d48-a.sdn.cz/d_48/c_img_qF_A/k0OqwCKRDbeZQVeH1PRuj/02da.png",
+   "name": "Bydlení a Reality s.r.o.",
+   "premise_paid_firmy": 1,
+   "premise_retargeting_id": null,
+   "review_count": 0,
+   "review_score": null,
+   "seo_name": "bydleni-a-reality-s-r-o",
+   "web_url": "https://example.com",
+   "web_visible_url": "https://example.com"
+  },
+  "price": 15950000.0,
+  "price_currency_cb": {
+   "name": "Kč",
+   "value": 1
+  },
+  "price_czk": 15950000.0,
+  "price_czk_m2": 175275,
+  "price_flag_negotiation_cb": false,
+  "price_note": "",
+  "price_summary": 15950000.0,
+  "price_summary_czk": 15950000.0,
+  "price_summary_old": 0.0,
+  "price_summary_old_czk": null,
+  "price_summary_unit_cb": {
+   "name": "za nemovitost",
+   "value": 1
+  },
+  "price_unit_cb": {
+   "name": "za nemovitost",
+   "value": 1
+  },
+  "project": null,
+  "protection": {
+   "name": "- vyber ochranu",
+   "value": 0
+  },
+  "ready_date": "2026-09-24",
+  "reconstruction_year": null,
+  "road_type_set": [],
+  "rus": null,
+  "rus_reply": null,
+  "sale_date": null,
+  "sdn_energy_performance_attachment_url": null,
+  "since": "2026-10-02",
+  "state_cb": {
+   "name": "- vyber stav",
+   "value": 0
+  },
+  "stats": 3089,
+  "surroundings_type": {
+   "name": "- vyber zástavbu",
+   "value": 0
+  },
+  "telecommunication_set": [],
+  "terrace": false,
+  "terrace_area": null,
+  "transport_set": [
+   {
+    "name": "Silnice",
+    "value": 3
+   },
+   {
+    "name": "MHD",
+    "value": 4
+   },
+   {
+    "name": "Autobus",
+    "value": 5
+   }
+  ],
+  "underground_floors": null,
+  "usable_area": 91,
+  "user": {
+   "broker_rating": null,
+   "broker_review_count": null,
+   "image": null,
+   "user_email": "jan.novak@example.com",
+   "user_id": 332129,
+   "user_name": "Ing. Jan Novák",
+   "user_phones": [
+    {
+     "phone": "+420777123456",
+     "phone_type": "TEL"
+    },
+    {
+     "phone": "+420777123456",
+     "phone_type": "MOB"
+    }
+   ]
+  },
+  "videos": [],
+  "water_heat_source_set": [],
+  "water_set": [
+   {
+    "name": "Vodovod",
+    "value": 2
+   }
+  ],
+  "well_type_set": []
+ },
+ "status_code": 200,
+ "status_message": "OK"
+}

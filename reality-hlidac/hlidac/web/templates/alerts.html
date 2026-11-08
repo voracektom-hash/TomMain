@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Historie · Reality Hlídač{% endblock %}
+{% set STATUS = {"sent": ("odesláno", "ok"), "queued": ("čeká", "wait"), "failed": ("selhalo", "err"), "dropped": ("zahozeno", "muted")} %}
+{% set KIND = {"new": "Nový", "price_drop": "Sleva", "service": "Servis"} %}
+{% block content %}
+<h1>Historie alertů</h1>
+{% if not rows %}<div class="empty"><p>Zatím nic neodešlo.</p></div>{% endif %}
+<div class="cards">
+{% for a in rows %}
+  {% set st = STATUS.get(a.status, (a.status, "")) %}
+  <article class="card alert">
+    <div class="alert-head">
+      <span class="badge kind-{{ a.kind }}">{{ KIND.get(a.kind, a.kind) }}</span>
+      <span class="badge {{ st[1] }}">{{ st[0] }}</span>
+      <small class="muted">{{ (a.sent_at or a.created_at) | local }}</small>
+    </div>
+    <strong>{{ a.title or a.body[:60] }}</strong>
+    <p class="body small">{{ a.body }}</p>
+    <p class="small muted">
+      {{ a.channel }} → {{ a.recipient }}
+      {% if a.rule_names %} · {{ a.rule_names }}{% endif %}
+      {% if a.status == 'queued' and a.send_after %} · odešle se {{ a.send_after | local }}{% endif %}
+      {% if a.error %} · <span class="err-text">{{ a.error[:140] }}</span>{% endif %}
+    </p>
+    {% if a.listing_id %}<a class="btn small-btn" href="https://www.sreality.cz/detail/prodej/byt/2+kk/x/{{ a.listing_id }}" target="_blank" rel="noopener">Otevřít inzerát</a>{% endif %}
+  </article>
+{% endfor %}
+</div>
+<div class="pager">
+  {% if page_no > 1 %}<a class="btn" href="/alerts?page={{ page_no - 1 }}">← Novější</a>{% endif %}
+  {% if has_next %}<a class="btn" href="/alerts?page={{ page_no + 1 }}">Starší →</a>{% endif %}
+</div>
+{% endblock %}

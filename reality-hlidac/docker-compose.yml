@@ -1,0 +1,54 @@
+# Reality Hlídač on a server:  docker compose up -d --build
+# Everything restarts on its own after a crash or a server reboot.
+
+x-app: &app
+  build: .
+  env_file: .env
+  environment: &app-env
+    DB_PATH: /data/hlidac.db   # inside the container; wins over DB_PATH from .env
+  volumes:
+    - ./data:/data
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  watcher:
+    <<: *app
+    command: python -m hlidac.watcher
+
+  web:
+    <<: *app
+    command: python -m hlidac.web.app
+    environment:
+      <<: *app-env
+      WEB_PORT: "8000"
+    expose: ["8000"]          # only Caddy can reach it, not the internet
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=5)"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  backup:
+    <<: *app
+    command: python -m hlidac.backup
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    env_file: .env
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  caddy_data:
+  caddy_config:
