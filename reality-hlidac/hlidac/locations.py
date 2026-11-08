@@ -106,15 +106,24 @@ def listing_locations(conn: sqlite3.Connection, listing: Listing, loc_type: str)
 
 def median_candidates(conn: sqlite3.Connection, listing: Listing, rule_type: str,
                       rule_location: str) -> list[tuple[str, str | None]]:
-    """Where to look for a median, most specific first."""
+    """Where to look for a median, most specific first.
+
+    A rule for a district or part ("Praha 5", "Smíchov") compares with that area.
+    A rule for a whole city ("Praha") compares each flat with its OWN district
+    (Praha 1–22), so "10 % below median" means cheap for that location, not just
+    an outskirts flat that is cheaper than the Prague-wide median.
+    """
     quarters = listing_locations(conn, listing, "quarter") if listing.region_id == 10 else set()
-    return [
-        (rule_type, rule_location),
+    quarter = next(iter(quarters)) if len(quarters) == 1 else None
+    own_area = [
+        ("quarter", quarter),
         ("citypart", listing.citypart),
-        ("quarter", next(iter(quarters)) if len(quarters) == 1 else None),
         ("district", listing.district if listing.region_id != 10 else None),
         ("city", listing.city),
     ]
+    if rule_type == "city":
+        return own_area
+    return [(rule_type, rule_location), *own_area]
 
 
 def short_name(listing: Listing) -> str:

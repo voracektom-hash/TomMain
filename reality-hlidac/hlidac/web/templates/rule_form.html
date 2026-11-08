@@ -74,7 +74,10 @@
         <input inputmode="decimal" name="max_price_m2_k" value="{{ num(rule.max_price_m2, 1000) }}" placeholder="150">{{ err('max_price_m2_k') }}</label>
     </div>
     <label class="field"><span>Aspoň o kolik % levnější než medián lokality</span>
-      <input inputmode="decimal" name="min_below_median" value="{{ num(rule.min_below_median) }}" placeholder="např. 10">{{ err('min_below_median') }}</label>
+      <input inputmode="decimal" name="min_below_median" value="{{ num(rule.min_below_median) }}" placeholder="např. 10">
+      <small class="muted">Porovnává se cena za m² se stejnou dispozicí. U lokality „Praha“ s mediánem obvodu,
+        kde byt leží (Praha 1–22), u konkrétní lokality s mediánem té lokality. Hodnoty najdeš v záložce Mediány.</small>
+      {{ err('min_below_median') }}</label>
     <label class="check"><input type="checkbox" name="price_drop_alert" value="1" {{ 'checked' if rule.price_drop_alert }}> Upozornit i na snížení ceny</label>
   </section>
 

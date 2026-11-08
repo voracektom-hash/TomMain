@@ -181,3 +181,21 @@ def test_gps_fills_missing_quarter(conn, praha, flat):
 def test_gps_without_neighbours(conn, praha, flat):
     far = replace(flat, id=1, quarter=None, lat=49.0, lon=13.0)
     assert gps_candidates(conn, far, "quarter") == set()
+
+
+def test_city_rule_compares_with_own_district_median(conn, praha, flat):
+    # Fake medians: Praha 2 is expensive, Prague overall cheaper.
+    with conn:
+        conn.execute("DELETE FROM medians")
+        conn.executemany(
+            "INSERT INTO medians (scope, location, disposition, median_m2, n, computed_at) "
+            "VALUES (?,?,?,?,?,?)",
+            [("quarter", "Praha 2", "", 200_000, 50, "x"), ("city", "Praha", "", 150_000, 900, "x")])
+    from hlidac.rules import below_median
+    whole_praha = rule(location_type="city", location="Praha")
+    pct, label = below_median(conn, whole_praha, flat)          # flat: 175 275 Kč/m² in Praha 2
+    assert label == "Praha 2" and round(pct) == 12              # cheap for Praha 2 …
+    pct, label = below_median(conn, rule(location_type="quarter", location="Praha 2"), flat)
+    assert label == "Praha 2"
+    assert check_listing(conn, rule(location_type="city", location="Praha",
+                                    min_below_median=10), flat) is None
